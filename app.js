@@ -18,3 +18,28 @@ country?.addEventListener("change",update);amount?.addEventListener("input",upda
 const I18N={en:{available:"コイン is available",emailPlaceholder:"Enter your email",multipleCurrencies:"Multiple currencies",multipleNetworks:"Multiple networks",transparent:"Clear pricing",tracking:"Track every order",privacyMatters:"Privacy matters"},pt:{available:"コイン está disponível",emailPlaceholder:"Introduza o seu email",multipleCurrencies:"Várias moedas",multipleNetworks:"Várias redes",transparent:"Preços transparentes",tracking:"Acompanhe cada pedido",privacyMatters:"A sua privacidade importa"}};
 function applyLanguage(lang){const d=I18N[lang]||I18N.en;document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.dataset.i18n;if(d[k])el.textContent=d[k]});document.querySelectorAll("[data-placeholder]").forEach(el=>{const k=el.dataset.placeholder;if(d[k])el.placeholder=d[k]});document.documentElement.lang=lang;localStorage.setItem("koinLanguage",lang)}
 const savedLanguage=localStorage.getItem("koinLanguage")||"en";if($("language")){ $("language").value=savedLanguage; applyLanguage(savedLanguage); $("language").addEventListener("change",e=>applyLanguage(e.target.value));}
+// Market chart rotation — presentation only; rates remain the platform reference rates.
+(function initMarketRotation(){
+  const line=$('chartLine'), area=$('chartArea'), value=$('chartCurrencyValue'), market=$('chartMarketValue'), note=$('chartCycleText');
+  if(!line || !area || !value || !market) return;
+  const markets=[
+    {code:'MZN',label:'Metical',price:65.00,path:'M0,138 C35,126 55,151 82,121 S125,112 150,130 S185,91 215,108 S250,77 282,96 S320,85 350,63 S390,72 420,48 S460,54 500,24'},
+    {code:'USD',label:'Dollar',price:1.02,path:'M0,150 C38,143 62,129 92,139 S132,120 160,128 S198,104 230,116 S270,88 305,98 S345,78 375,84 S418,62 450,72 S475,45 500,52'},
+    {code:'AOA',label:'Kwanza',price:950.00,path:'M0,132 C30,148 60,119 90,126 S125,98 155,118 S195,82 225,104 S265,70 300,91 S335,63 370,77 S405,52 438,60 S470,35 500,42'},
+    {code:'ZAR',label:'Rand',price:18.50,path:'M0,145 C30,132 58,141 86,119 S125,126 155,106 S192,113 220,91 S260,99 292,74 S325,90 355,66 S398,79 425,53 S462,64 500,35'}
+  ];
+  let i=0;
+  const apply=()=>{
+    const m=markets[i];
+    const d=m.path;
+    line.setAttribute('d',d);
+    area.setAttribute('d',d+' L500,180 L0,180 Z');
+    value.textContent=m.price.toFixed(2)+' '+m.code;
+    market.textContent='USDT / '+m.code;
+    if(note) note.textContent='Reference market • '+m.label;
+    i=(i+1)%markets.length;
+  };
+  apply();
+  setInterval(apply,5000);
+})();
+

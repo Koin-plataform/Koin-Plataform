@@ -41,6 +41,7 @@
       <a href="#buy" data-i18n="navBuy">Buy USDT</a>
       <a href="#markets" data-i18n="navMarkets">Markets</a>
       <a href="#how" data-i18n="navHow">How it works</a>
+      <a href="p2p.html" class="nav-p2p">P2P</a>
       <a href="faq.html" data-i18n="navFaq">FAQ</a>
     </nav>
 
@@ -101,6 +102,8 @@
 
           <button type="button" class="secondary-button track-home-btn" id="trackHomeBtn">Track an order</button>
 
+          <a href="p2p.html" class="secondary-button p2p-home-btn">P2P Market</a>
+
         </div>
 
         <div class="supported">
@@ -156,6 +159,7 @@
             </defs>
 
             <path
+              id="chartArea"
               class="chart-area"
               d="M0,145
               C35,135 45,150 70,130
@@ -170,6 +174,7 @@
             />
 
             <path
+              id="chartLine"
               class="chart-line"
               d="M0,145
               C35,135 45,150 70,130
@@ -197,16 +202,18 @@
         <div class="market-price">
 
           <div>
-            <span data-i18n="reference">Reference</span>
-            <strong>$1.00</strong>
+            <span id="chartCurrencyLabel" data-i18n="reference">Reference</span>
+            <strong id="chartCurrencyValue">65.00 MZN</strong>
           </div>
 
           <div>
-            <span data-i18n="asset">Asset</span>
-            <strong>USDT</strong>
+            <span id="chartAssetLabel" data-i18n="asset">Market</span>
+            <strong id="chartMarketValue">USDT / MZN</strong>
           </div>
 
         </div>
+
+        <div class="chart-cycle-note"><span class="chart-cycle-dot"></span><span id="chartCycleText">Rotating reference markets</span></div>
 
       </div>
 
@@ -747,7 +754,8 @@
 
         <h4 data-i18n="information">Information</h4>
 
-        <a href="faq.html" data-i18n="navFaq">FAQ</a>
+        <a href="p2p.html" class="nav-p2p">P2P</a>
+      <a href="faq.html" data-i18n="navFaq">FAQ</a>
         <a href="contact.html" data-i18n="contact">Contact</a>
         <a href="risk.html" data-i18n="risk">Risk Disclosure</a>
 

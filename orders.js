@@ -9,7 +9,7 @@ const db=require("./database");
 const router=express.Router();
 const RATES={MZN:65,AOA:950,ZAR:18.5,USD:1.02};
 const FEES={TRC20:1,BEP20:.5,ERC20:5,POLYGON:.3,SOLANA:.2};
-const METHODS={MZN:["MPESA","ABSA","PAYPAL"],AOA:["BANK_TRANSFER","PAYPAL"],ZAR:["PAYPAL","STANDARD_BANK","ABSA"],USD:["CARD","PAYPAL"]};
+const METHODS={MZN:["MPESA","ABSA","STANDARD_BANK","PAYPAL"],AOA:["BANK_TRANSFER","PAYPAL"],ZAR:["PAYPAL","STANDARD_BANK","ABSA"],USD:["CARD","PAYPAL"]};
 const PAYMENT_DETAILS={
  MPESA:{label:"M-Pesa",title:"M-Pesa payment",fields:["Name","Number"],values:[process.env.MPESA_NAME||"KOIN TEST",process.env.MPESA_NUMBER||"84 000 0000"],instruction:"Send the exact total shown for your order, then enter the M-Pesa transaction ID below. No screenshot is required."},
  ABSA:{label:"ABSA",title:"ABSA bank transfer",fields:["Account name","Account number","Branch"],values:[process.env.ABSA_ACCOUNT_NAME||"KOIN TEST",process.env.ABSA_ACCOUNT||"0000000000",process.env.ABSA_BRANCH||"0000"],instruction:"Make the transfer using the details above, then upload your payment proof."},
@@ -26,8 +26,21 @@ function publicOrder(o){if(!o)return null;const copy={...o};delete copy.proofPat
 function validWallet(network,w){w=String(w||"").trim();if(network==="TRC20")return /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(w);if(["BEP20","ERC20","POLYGON"].includes(network))return /^0x[a-fA-F0-9]{40}$/.test(w);if(network==="SOLANA")return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(w);return false}
 function allowed(currency,method){return METHODS[currency]?.includes(method)}
 function esc(s){return String(s??"").replace(/[&<>\"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]))}
-const publicUrl=()=>String(process.env.PUBLIC_URL||"http://localhost:3000").replace(/\/$/,"");
-function emailLayout(title,body,reference){const statusUrl=reference?`${publicUrl()}/status.html?reference=${encodeURIComponent(reference)}`:publicUrl();return `<!doctype html><html><body style="margin:0;background:#07090d;color:#eef2f7;font-family:Arial,sans-serif;padding:30px"><div style="max-width:620px;margin:auto;background:#10151d;border:1px solid #24303c;border-radius:18px;padding:28px"><div style="font-size:24px;font-weight:800;color:#20c997">コイン</div><h1 style="font-size:25px">${esc(title)}</h1>${body}<p style="margin:24px 0"><a href="${statusUrl}" style="display:inline-block;background:#20c997;color:#03130d;text-decoration:none;font-weight:800;padding:12px 17px;border-radius:10px">Track order</a></p><p style="color:#8d97a5;font-size:12px;margin-top:28px">Automated message from コイン. You can close the website and use this link to check your order later.</p></div></body></html>`}
+const publicUrl=()=>String(process.env.PUBLIC_URL||process.env.RENDER_EXTERNAL_URL||"http://localhost:3000").replace(/\/$/,"");
+function emailLayout(title,body,reference){
+ const statusUrl=reference?`${publicUrl()}/status.html?reference=${encodeURIComponent(reference)}`:publicUrl();
+ const safeUrl=esc(statusUrl);
+ return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;background:#07090d;color:#eef2f7;font-family:Arial,Helvetica,sans-serif;-webkit-text-size-adjust:100%"><div style="padding:28px 14px;background:radial-gradient(circle at 50% 0%,rgba(32,201,151,.12),transparent 42%),#07090d"><div style="width:100%;max-width:620px;margin:0 auto;background:#10151d;border:1px solid #26313d;border-radius:20px;overflow:hidden;box-shadow:0 18px 55px rgba(0,0,0,.35)">
+ <div style="padding:22px 24px;border-bottom:1px solid #202a34;background:linear-gradient(135deg,#121a20,#0e1319)">
+  <div style="display:flex;align-items:center;gap:10px">
+   <div style="width:42px;height:42px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#24d7a3,#119b77);border:2px solid rgba(255,255,255,.14);box-shadow:0 0 24px rgba(32,201,151,.22);color:#04120d;font-size:19px;font-weight:900">コ</div>
+   <div><div style="font-size:19px;line-height:1;font-weight:900;letter-spacing:.2px;color:#f5f7fa">コイン</div><div style="font-size:10px;color:#7f8a98;margin-top:4px;letter-spacing:1.2px;text-transform:uppercase">USDT • Order service</div></div>
+  </div>
+ </div>
+ <div style="padding:26px 24px 24px"><div style="font-size:10px;color:#20c997;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">Order update</div><h1 style="margin:0;font-size:25px;line-height:1.2;color:#f4f7fa">${esc(title)}</h1>${body}<div style="margin:24px 0 8px"><a href="${safeUrl}" style="display:inline-block;background:#20c997;color:#04130e;text-decoration:none;font-weight:900;font-size:12px;padding:13px 18px;border-radius:11px">Track your order&nbsp; →</a></div><div style="font-size:11px;line-height:1.6;color:#687483;word-break:break-all">If the button does not open, use this link:<br><a href="${safeUrl}" style="color:#20c997;text-decoration:none">${safeUrl}</a></div></div>
+ <div style="padding:15px 24px;border-top:1px solid #202a34;background:#0c1117;color:#687483;font-size:10px;line-height:1.55">This is an automated message from コイン. Keep your order reference for support. Never share wallet private keys or passwords.</div>
+ </div></div></body></html>`;
+}
 function orderDetailsHtml(o){return `<div style="margin:18px 0;padding:16px;background:#0b1017;border:1px solid #26323e;border-radius:12px"><p style="margin:4px 0"><b>Order:</b> ${esc(o.reference)}</p><p style="margin:4px 0"><b>Customer:</b> ${esc(o.customerName)}</p><p style="margin:4px 0"><b>Amount:</b> ${esc(o.amountUSDT)} USDT</p><p style="margin:4px 0"><b>Network:</b> ${esc(o.network)}</p><p style="margin:4px 0"><b>Network fee:</b> ${esc(o.networkFeeUSDT)} USDT</p><p style="margin:4px 0"><b>USDT price:</b> ${esc(o.unitPrice)} ${esc(o.currency)} / USDT</p><p style="margin:4px 0"><b>Total to pay:</b> ${esc(o.totalFiat)} ${esc(o.currency)}</p><p style="margin:4px 0;word-break:break-all"><b>Receiving wallet:</b> ${esc(o.walletAddress)}</p>${o.paymentMethod?`<p style="margin:4px 0"><b>Payment method:</b> ${esc(o.paymentMethod)}</p>`:""}${o.paymentReference?`<p style="margin:4px 0"><b>Payment reference:</b> ${esc(o.paymentReference)}</p>`:""}</div>`}
 async function sendEmail(to,subject,html){
  const recipient=String(to||"").trim(),apiKey=String(process.env.RESEND_API_KEY||"").trim(),from=String(process.env.MAIL_FROM||"").trim();
