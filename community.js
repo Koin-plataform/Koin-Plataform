@@ -1,6 +1,5 @@
 "use strict";
-const crypto=require("crypto");
-const fs=require("fs"),path=require("path");
+const fs=require("fs"),path=require("path"),crypto=require("crypto");
 const dir=path.join(__dirname,"database");
 const file=path.join(dir,"community.json");
 function ensure(){if(!fs.existsSync(dir))fs.mkdirSync(dir,{recursive:true});if(!fs.existsSync(file))fs.writeFileSync(file,JSON.stringify({messages:[],offers:[]},null,2));}
@@ -20,14 +19,15 @@ function addOffer(data){
   min:String(data.min||"").trim().slice(0,30),
   max:String(data.max||"").trim().slice(0,30),
   payment:String(data.payment||"").trim().slice(0,50),
-  contactType:data.contactType==="email"?"email":"private_chat",
+  contactType:["email","telegram","private_chat"].includes(data.contactType)?data.contactType:"private_chat",
   contactValue:String(data.contactValue||"").trim().slice(0,160),
   message:String(data.message||"").trim().slice(0,300),
   createdAt:new Date().toISOString(),
   active:true
  };
  if(!offer.price||!offer.min||!offer.max||!offer.payment) throw new Error("Missing offer fields");
- if(offer.contactType==="email"&&!offer.contactValue) throw new Error("Email is required");
+ if(["email","telegram"].includes(offer.contactType)&&!offer.contactValue) throw new Error(offer.contactType==="telegram"?"Telegram username is required":"Email is required");
+ if(offer.contactType==="telegram" && !/^@?[A-Za-z0-9_]{4,32}$/.test(offer.contactValue)) throw new Error("Invalid Telegram username");
  d.offers=(d.offers||[]).concat(offer).slice(-2000);write(d);return offer;
 }
 function removeOffer(id){const d=read();const o=(d.offers||[]).find(x=>x.id===id);if(!o)return null;o.active=false;write(d);return o}
