@@ -482,7 +482,7 @@
           </div>
 
           <small id="minimumText">
-            Minimum: 10 USDT
+            Minimum depends on the selected network
           </small>
 
         </div>
@@ -858,5 +858,26 @@
 
   <script src="app.js"></script>
 
+
+<div class="welcome-overlay" id="welcomeOverlay" aria-hidden="true">
+  <div class="welcome-card">
+    <div class="welcome-kicker">WELCOME TO コイン</div>
+    <h2>Antes de começar...</h2>
+    <p>Responde a 3 perguntas rápidas. Vamos usar as respostas para preparar a experiência.</p>
+    <div class="welcome-step" data-step="1">
+      <span class="welcome-count">01 / 03</span><h3>Já usas criptomoedas?</h3>
+      <div class="welcome-options"><button data-answer="crypto" data-value="new">Sou novo</button><button data-answer="crypto" data-value="some">Já conheço</button><button data-answer="crypto" data-value="advanced">Tenho experiência</button></div>
+    </div>
+    <div class="welcome-step" data-step="2" hidden>
+      <span class="welcome-count">02 / 03</span><h3>O que procuras fazer aqui?</h3>
+      <div class="welcome-options"><button data-answer="purpose" data-value="buy">Comprar USDT</button><button data-answer="purpose" data-value="sell">Negociar com pessoas</button><button data-answer="purpose" data-value="learn">Aprender primeiro</button></div>
+    </div>
+    <div class="welcome-step" data-step="3" hidden>
+      <span class="welcome-count">03 / 03</span><h3>Qual mercado vais usar?</h3>
+      <div class="welcome-options"><button data-answer="market" data-value="MZN">🇲🇿 MZN · Moçambique</button><button data-answer="market" data-value="AOA">🇦🇴 AOA · Angola</button><button data-answer="market" data-value="ZAR">🇿🇦 ZAR · África do Sul</button><button data-answer="market" data-value="USD">🌎 USD · Internacional</button></div>
+    </div>
+    <div class="welcome-footer"><button class="welcome-skip" id="welcomeSkip">Skip</button><span class="welcome-dots" id="welcomeDots">● ○ ○</span></div>
+  </div>
+</div>
 </body>
 </html>
