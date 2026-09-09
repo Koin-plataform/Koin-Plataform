@@ -1,0 +1,62 @@
+[
+  {
+    "id": "56b30ad9-af66-47c5-8e3f-2c53fead1a75",
+    "reference": "KOIN-20260909-9F38D6",
+    "customerName": "Dude Eduardo",
+    "customerEmail": "dudeeduardo8@gmail.com",
+    "amountUSDT": 1000,
+    "network": "TRC20",
+    "networkFeeUSDT": 1,
+    "currency": "MZN",
+    "unitPrice": 65,
+    "totalFiat": 65065,
+    "walletAddress": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+    "paymentMethod": "MPESA",
+    "paymentReference": "CJMJDKSKDB776",
+    "status": "COMPLETED",
+    "proofPath": null,
+    "proofOriginalName": null,
+    "proofUploadedAt": null,
+    "processingDeadline": "2026-09-09T12:42:40.463Z",
+    "txid": "797089",
+    "createdAt": "2026-09-09T12:21:46.791Z",
+    "updatedAt": "2026-09-09T12:24:06.985Z",
+    "emailNotifications": true,
+    "emailLog": [
+      {
+        "event": "ORDER_CREATED",
+        "status": "FAILED",
+        "id": null,
+        "error": "email_not_configured",
+        "at": "2026-09-09T12:21:46.809Z"
+      },
+      {
+        "event": "PAYMENT_REPORTED",
+        "status": "FAILED",
+        "id": null,
+        "error": "email_not_configured",
+        "at": "2026-09-09T12:22:40.471Z"
+      },
+      {
+        "event": "PAYMENT_CONFIRMED",
+        "status": "FAILED",
+        "id": null,
+        "error": "email_not_configured",
+        "at": "2026-09-09T12:23:55.078Z"
+      },
+      {
+        "event": "ORDER_COMPLETED",
+        "status": "FAILED",
+        "id": null,
+        "error": "email_not_configured",
+        "at": "2026-09-09T12:24:06.983Z"
+      }
+    ],
+    "lastEmailStatus": "FAILED",
+    "lastEmailError": "email_not_configured",
+    "lastEmailAt": "2026-09-09T12:24:06.983Z",
+    "paymentReportedAt": "2026-09-09T12:22:40.463Z",
+    "paymentConfirmedAt": "2026-09-09T12:23:55.056Z",
+    "completedAt": "2026-09-09T12:24:06.954Z"
+  }
+]

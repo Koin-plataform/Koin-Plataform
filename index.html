@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>コイン — Buy USDT</title>
+
+  <meta
+    name="description"
+    content="Buy USDT using MZN, AOA, ZAR or USD. Choose your preferred network and receive USDT directly to your wallet."
+  >
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body><div class="coin-bg" aria-hidden="true"><span class="cb c1">₿</span><span class="cb c2">Ξ</span><span class="cb c3">₮</span><span class="cb c4">◎</span><span class="cb c5">₿</span><span class="cb c6">◈</span><span class="cb c7">Ξ</span><span class="cb c8">₮</span><span class="cb c9">◎</span><span class="cb c10">₿</span><span class="cb c11">◈</span><span class="cb c12">Ξ</span></div>
+
+  <div class="site-backdrop" aria-hidden="true"><div class="backdrop-grid"></div><div class="backdrop-orb orb-a"></div><div class="backdrop-orb orb-b"></div><div class="backdrop-glow glow-a"></div><div class="backdrop-glow glow-b"></div></div>
+
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <!-- HEADER -->
+  <header class="navbar">
+
+    <a href="index.html" class="logo">
+      <div class="logo-icon">コ</div>
+      <div><span>コイン</span></div>
+    </a>
+
+    <nav class="main-nav">
+      <a href="#buy" data-i18n="navBuy">Buy USDT</a>
+      <a href="#markets" data-i18n="navMarkets">Markets</a>
+      <a href="#how" data-i18n="navHow">How it works</a>
+      <a href="faq.html" data-i18n="navFaq">FAQ</a>
+    </nav>
+
+    <div class="header-actions">
+
+      <select id="language" aria-label="Language">
+        <option value="pt">PT</option>
+        <option value="en">EN</option>
+      </select>
+
+      <select id="country" aria-label="Currency">
+        <option value="MZN">MZN</option>
+        <option value="AOA">AOA</option>
+        <option value="ZAR">ZAR</option>
+        <option value="USD">USD</option>
+      </select>
+
+      <button type="button" class="header-order-btn" id="myOrdersBtn">My orders</button>
+
+    </div>
+
+  </header>
+
+
+  <main>
+
+    <!-- HERO -->
+    <section class="hero">
+
+      <div class="hero-content">
+
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          <span data-i18n="available">コイン is available</span>
+        </div>
+
+        <h1>
+          <span data-i18n="heroLine1">Buy USDT.</span><br>
+          <span class="accent" data-i18n="heroSimple">Simple.</span>
+          <span data-i18n="heroDirect">Direct.</span>
+        </h1>
+
+        <p class="hero-description" data-i18n="heroDescription">
+          Choose your local currency, select your preferred blockchain
+          network and receive USDT directly at the wallet address you provide.
+        </p>
+
+        <div class="hero-buttons">
+
+          <a href="#buy" class="primary-button">
+            <span data-i18n="buyUsdt">Buy USDT</span>
+            <span>→</span>
+          </a>
+
+          <a href="#how" class="secondary-button" data-i18n="howWorks">
+            How it works
+          </a>
+
+          <button type="button" class="secondary-button track-home-btn" id="trackHomeBtn">Track an order</button>
+
+        </div>
+
+        <div class="supported">
+
+          <span data-i18n="supportedMarkets">Supported markets</span>
+
+          <div class="currency-list">
+            <div><img class="flag-img" src="https://flagcdn.com/w40/mz.png" alt="Mozambique"> MZN</div>
+            <div><img class="flag-img" src="https://flagcdn.com/w40/ao.png" alt="Angola"> AOA</div>
+            <div><img class="flag-img" src="https://flagcdn.com/w40/za.png" alt="South Africa"> ZAR</div>
+            <div><img class="flag-img" src="https://flagcdn.com/w40/us.png" alt="United States"> USD</div>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- MARKET CARD -->
+      <div class="market-preview">
+
+        <div class="market-top">
+
+          <div>
+            <span class="small-label">USDT MARKET</span>
+            <h3>USDT</h3>
+          </div>
+
+          <div class="market-status">
+            <span></span>
+            <small data-i18n="reference">REFERENCE</small>
+          </div>
+
+        </div>
+
+        <div class="chart">
+
+          <div class="chart-grid"></div>
+
+          <svg viewBox="0 0 500 180" preserveAspectRatio="none">
+
+            <defs>
+              <linearGradient
+                id="chartFill"
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop offset="0%" stop-opacity=".20"/>
+                <stop offset="100%" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+
+            <path
+              class="chart-area"
+              d="M0,145
+              C35,135 45,150 70,130
+              S105,120 125,135
+              S155,100 180,115
+              S220,80 245,105
+              S280,95 300,75
+              S335,90 355,65
+              S395,70 420,48
+              S455,58 500,25
+              L500,180 L0,180 Z"
+            />
+
+            <path
+              class="chart-line"
+              d="M0,145
+              C35,135 45,150 70,130
+              S105,120 125,135
+              S155,100 180,115
+              S220,80 245,105
+              S280,95 300,75
+              S335,90 355,65
+              S395,70 420,48
+              S455,58 500,25"
+            />
+
+          </svg>
+
+        </div>
+
+        <div class="chart-times">
+          <span>1H</span>
+          <span>1D</span>
+          <span class="active">1W</span>
+          <span>1M</span>
+          <span>1Y</span>
+        </div>
+
+        <div class="market-price">
+
+          <div>
+            <span data-i18n="reference">Reference</span>
+            <strong>$1.00</strong>
+          </div>
+
+          <div>
+            <span data-i18n="asset">Asset</span>
+            <strong>USDT</strong>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- MARKETS -->
+    <section class="section" id="markets">
+
+      <div class="section-heading">
+
+        <div>
+          <span class="eyebrow">MARKETS</span>
+          <h2 data-i18n="availableCurrencies">
+            Available currencies
+          </h2>
+        </div>
+
+        <span class="updated" data-i18n="pricesSet">
+          Prices are set by the platform
+        </span>
+
+      </div>
+
+
+      <div class="rate-grid">
+
+        <div class="rate-card">
+
+          <div class="coin">
+            <div class="coin-icon">₮</div>
+
+            <div>
+              <strong>USDT / MZN</strong>
+              <span><img class="flag-img" src="https://flagcdn.com/w40/mz.png" alt="Mozambique"> Mozambique</span>
+            </div>
+          </div>
+
+          <strong class="rate">65.00</strong>
+          <span class="rate-label">MZN per USDT</span>
+
+        </div>
+
+
+        <div class="rate-card">
+
+          <div class="coin">
+            <div class="coin-icon">₮</div>
+
+            <div>
+              <strong>USDT / AOA</strong>
+              <span><img class="flag-img" src="https://flagcdn.com/w40/ao.png" alt="Angola"> Angola</span>
+            </div>
+          </div>
+
+          <strong class="rate">950.00</strong>
+          <span class="rate-label">AOA per USDT</span>
+
+        </div>
+
+
+        <div class="rate-card">
+
+          <div class="coin">
+            <div class="coin-icon">₮</div>
+
+            <div>
+              <strong>USDT / ZAR</strong>
+              <span><img class="flag-img" src="https://flagcdn.com/w40/za.png" alt="South Africa"> South Africa</span>
+            </div>
+          </div>
+
+          <strong class="rate">18.50</strong>
+          <span class="rate-label">ZAR per USDT</span>
+
+        </div>
+
+
+        <div class="rate-card">
+
+          <div class="coin">
+            <div class="coin-icon">₮</div>
+
+            <div>
+              <strong>USDT / USD</strong>
+              <span><img class="flag-img" src="https://flagcdn.com/w40/us.png" alt="United States"> United States</span>
+            </div>
+          </div>
+
+          <strong class="rate">1.02</strong>
+          <span class="rate-label">USD per USDT</span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- BUY -->
+    <section class="buy-section" id="buy">
+
+      <div class="buy-info">
+
+        <span class="eyebrow">BUY USDT</span>
+
+        <h2 data-i18n="sendDirect">
+          Send USDT directly<br>
+          to your wallet.
+        </h2>
+
+        <p data-i18n="buyDescription">
+          No customer account is required. Provide the information
+          required for your order and follow the payment instructions.
+        </p>
+
+
+        <div class="feature-list">
+
+          <div class="feature">
+
+            <div class="feature-icon">✓</div>
+
+            <div>
+              <strong data-i18n="multipleCurrencies">
+                Multiple currencies
+              </strong>
+
+              <span data-i18n="multipleCurrenciesDesc">
+                MZN, AOA, ZAR and USD.
+              </span>
+            </div>
+
+          </div>
+
+
+          <div class="feature">
+
+            <div class="feature-icon">✓</div>
+
+            <div>
+              <strong data-i18n="multipleNetworks">
+                Multiple networks
+              </strong>
+
+              <span data-i18n="multipleNetworksDesc">
+                Choose the network supported by your wallet.
+              </span>
+            </div>
+
+          </div>
+
+
+          <div class="feature">
+
+            <div class="feature-icon">✓</div>
+
+            <div>
+              <strong data-i18n="transparent">
+                Transparent calculation
+              </strong>
+
+              <span data-i18n="transparentDesc">
+                The amount and applicable fee are shown before continuing.
+              </span>
+            </div>
+
+          </div>
+
+
+          <div class="feature">
+
+            <div class="feature-icon">✓</div>
+
+            <div>
+              <strong data-i18n="tracking">
+                Order tracking
+              </strong>
+
+              <span data-i18n="trackingDesc">
+                Follow the status of your purchase after submitting it.
+              </span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- CHECKOUT CARD -->
+      <div class="card" id="buy-card">
+
+        <div class="card-heading">
+
+          <div>
+            <span class="small-label">CHECKOUT</span>
+
+            <h3 data-i18n="placeOrder">
+              Place your order
+            </h3>
+          </div>
+
+          <div class="secure-badge">
+            <span></span>
+            <span data-i18n="available">Available</span>
+          </div>
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="customerName" data-i18n="yourName">
+            Your name
+          </label>
+
+          <input
+            type="text"
+            id="customerName"
+            autocomplete="name"
+            placeholder="Enter your name"
+            data-placeholder="namePlaceholder"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="customerEmail" data-i18n="yourEmail">
+            Email
+          </label>
+
+          <input
+            type="email"
+            id="customerEmail"
+            autocomplete="email"
+            placeholder="Enter your email"
+            data-placeholder="emailPlaceholder"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="amount" data-i18n="amountUsdt">
+            Amount of USDT
+          </label>
+
+          <div class="input-with-label">
+
+            <input
+              type="number"
+              id="amount"
+              min="10"
+              step="0.01"
+              placeholder="0.00"
+              inputmode="decimal"
+            >
+
+            <span>USDT</span>
+
+          </div>
+
+          <small id="minimumText">
+            Minimum: 10 USDT
+          </small>
+
+        </div>
+
+
+        <div class="field network-field">
+          <label data-i18n="network">Network</label>
+          <div class="network-picker" id="networkPicker">
+            <button type="button" class="network-card active" data-network="TRC20"><span class="network-logo tron-logo" aria-label="TRON"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 7.5 40 15l-8 25-8-8.5-8.5 8L8 7.5Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="m8 7.5 16 24 16-16.5M24 31.5l.2-15.8L40 15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>TRC20</span><small>TRON</small><b>1.00 USDT</b></button>
+            <button type="button" class="network-card" data-network="BEP20"><img src="https://cdn.simpleicons.org/bnbchain" alt="BNB Chain"><span>BEP20</span><small>BNB Smart Chain</small><b>0.50 USDT</b></button>
+            <button type="button" class="network-card" data-network="ERC20"><img src="https://cdn.simpleicons.org/ethereum" alt="Ethereum"><span>ERC20</span><small>Ethereum</small><b>5.00 USDT</b></button>
+            <button type="button" class="network-card" data-network="POLYGON"><img src="https://cdn.simpleicons.org/polygon" alt="Polygon"><span>Polygon</span><small>Polygon</small><b>0.30 USDT</b></button>
+            <button type="button" class="network-card" data-network="SOLANA"><img src="https://cdn.simpleicons.org/solana" alt="Solana"><span>Solana</span><small>Solana</small><b>0.20 USDT</b></button>
+          </div>
+          <select id="network" class="visually-hidden" aria-hidden="true" tabindex="-1">
+            <option value="TRC20">TRC20</option><option value="BEP20">BEP20</option><option value="ERC20">ERC20</option><option value="POLYGON">Polygon</option><option value="SOLANA">Solana</option>
+          </select>
+        </div>
+
+
+        <div class="field">
+
+          <label for="wallet" data-i18n="receivingAddress">
+            Receiving address
+          </label>
+
+          <input
+            type="text"
+            id="wallet"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="Enter your USDT wallet address"
+            data-placeholder="walletPlaceholder"
+          >
+
+        </div>
+
+
+        <!-- SUMMARY -->
+        <div class="summary">
+
+          <div>
+            <span data-i18n="usdtAmount">USDT amount</span>
+            <strong id="usdtAmount">0.00 USDT</strong>
+          </div>
+
+          <div>
+            <span data-i18n="networkFee">Network fee</span>
+            <strong id="networkFee">0.00 USDT</strong>
+          </div>
+
+          <div>
+            <span data-i18n="usdtPrice">USDT price</span>
+            <strong id="unitPrice">1 USDT = 65.00 MZN</strong>
+          </div>
+
+          <hr>
+
+          <div class="total">
+            <span data-i18n="totalToPay">Total to pay</span>
+            <strong id="totalPrice">0.00 MZN</strong>
+          </div>
+
+        </div>
+
+
+        <button id="continueBtn" type="button">
+
+          <span data-i18n="continue">
+            Continue
+          </span>
+
+          <span>→</span>
+
+        </button>
+
+
+        <p class="notice" data-i18n="checkoutNotice">
+          The network fee is charged separately from the USDT amount
+          requested. Always verify your address and selected network
+          before submitting.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- HOW -->
+    <section class="section how-section" id="how">
+
+      <div class="section-heading center">
+
+        <span class="eyebrow">PROCESS</span>
+
+        <h2 data-i18n="howWorks">
+          How it works
+        </h2>
+
+        <p data-i18n="processDescription">
+          A simple order flow without unnecessary account creation.
+        </p>
+
+      </div>
+
+
+      <div class="steps">
+
+        <div class="step">
+
+          <div class="step-number">01</div>
+
+          <h3 data-i18n="step1Title">
+            Create order
+          </h3>
+
+          <p data-i18n="step1Desc">
+            Enter your name, email, amount, network and receiving address.
+          </p>
+
+        </div>
+
+
+        <div class="step">
+
+          <div class="step-number">02</div>
+
+          <h3 data-i18n="step2Title">
+            Review
+          </h3>
+
+          <p data-i18n="step2Desc">
+            Review the USDT amount, network fee, price and total.
+          </p>
+
+        </div>
+
+
+        <div class="step">
+
+          <div class="step-number">03</div>
+
+          <h3 data-i18n="step3Title">
+            Payment
+          </h3>
+
+          <p data-i18n="step3Desc">
+            Follow the payment instructions associated with your order.
+          </p>
+
+        </div>
+
+
+        <div class="step">
+
+          <div class="step-number">04</div>
+
+          <h3 data-i18n="step4Title">
+            Receive
+          </h3>
+
+          <p data-i18n="step4Desc">
+            After payment confirmation, the USDT transfer is processed.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- INFORMATION -->
+    <section class="section information-section">
+
+      <div class="info-grid">
+
+        <div class="info-box">
+
+          <span class="eyebrow">NETWORK</span>
+
+          <h3 data-i18n="chooseCarefully">
+            Choose carefully
+          </h3>
+
+          <p data-i18n="networkWarning">
+            The receiving address must be compatible with the network
+            selected in your order. An incompatible network can result
+            in permanent loss.
+          </p>
+
+        </div>
+
+
+        <div class="info-box">
+
+          <span class="eyebrow">PRICING</span>
+
+          <h3 data-i18n="pricesChange">
+            Prices can change
+          </h3>
+
+          <p data-i18n="pricingDescription">
+            The platform may update its USDT price and fees. The values
+            quoted for an order are stored with that order.
+          </p>
+
+        </div>
+
+
+        <div class="info-box">
+
+          <span class="eyebrow">ORDERS</span>
+
+          <h3 data-i18n="manualConfirmation">
+            Manual confirmation
+          </h3>
+
+          <p data-i18n="manualDescription">
+            Payments are manually confirmed by the platform operator
+            before USDT is released.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- FOOTER -->
+  <footer>
+
+    <div class="footer-main">
+
+      <div class="footer-brand">
+
+        <a href="index.html" class="logo">
+
+          <div class="logo-icon">コ</div>
+
+          <div><span>コイン</span></div>
+
+        </a>
+
+        <p data-i18n="footerDescription">
+          A simple interface for purchasing USDT across supported
+          markets and networks.
+        </p>
+
+      </div>
+
+
+      <div class="footer-column">
+
+        <h4 data-i18n="platform">Platform</h4>
+
+        <a href="#buy" data-i18n="buyUsdt">Buy USDT</a>
+        <a href="#markets" data-i18n="navMarkets">Markets</a>
+        <a href="#how" data-i18n="navHow">How it works</a>
+        <a href="status.html" data-i18n="orderStatus">Order Status</a>
+
+      </div>
+
+
+      <div class="footer-column">
+
+        <h4 data-i18n="information">Information</h4>
+
+        <a href="faq.html" data-i18n="navFaq">FAQ</a>
+        <a href="contact.html" data-i18n="contact">Contact</a>
+        <a href="risk.html" data-i18n="risk">Risk Disclosure</a>
+
+      </div>
+
+
+      <div class="footer-column">
+
+        <h4 data-i18n="legal">Legal</h4>
+
+        <a href="terms.html" data-i18n="terms">Terms</a>
+        <a href="privacy.html" data-i18n="privacy">Privacy</a>
+        <a href="cookies.html" data-i18n="cookies">Cookies</a>
+
+      </div>
+
+    </div>
+
+
+    <div class="footer-bottom">
+
+      <span>© 2026 コイン</span>
+
+      <span data-i18n="digitalAssetsRisk">
+        Digital assets involve risks.
+      </span>
+
+    </div>
+
+  </footer>
+
+
+  <!-- ORDER CENTER -->
+  <div class="order-center" id="orderCenter" aria-hidden="true">
+    <div class="order-center-backdrop" id="orderCenterBackdrop"></div>
+    <section class="order-center-panel" role="dialog" aria-modal="true" aria-labelledby="orderCenterTitle">
+      <button type="button" class="modal-close" id="closeOrderCenter" aria-label="Close">×</button>
+      <span class="eyebrow">ORDER CENTER</span>
+      <h2 id="orderCenterTitle">Track your orders</h2>
+      <p class="modal-subtitle">Orders created in this browser appear here. You can also enter a reference manually.</p>
+      <div class="track-form">
+        <input id="trackReference" type="text" placeholder="KOIN-20260909-ABC123" autocomplete="off">
+        <button type="button" class="primary-button modal-track" id="trackReferenceBtn">Track order →</button>
+      </div>
+      <div id="orderHistory" class="order-history"></div>
+    </section>
+  </div>
+
+  <!-- COOKIE -->
+  <div class="cookie-banner" id="cookieBanner">
+
+    <div class="cookie-text">
+
+      <div class="cookie-icon">🍪</div>
+
+      <div>
+
+        <strong data-i18n="privacyMatters">
+          Your privacy matters
+        </strong>
+
+        <p data-i18n="cookieDescription">
+          We use local storage to remember preferences and order information
+          in this browser.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="cookie-actions">
+
+      <button
+        class="cookie-reject"
+        id="rejectCookies"
+        type="button"
+        data-i18n="reject"
+      >
+        Reject
+      </button>
+
+      <button
+        class="cookie-accept"
+        id="acceptCookies"
+        type="button"
+        data-i18n="accept"
+      >
+        Accept
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- MESSAGE -->
+  <div id="message" class="message"></div>
+
+
+  <script src="app.js"></script>
+
+</body>
+</html>
