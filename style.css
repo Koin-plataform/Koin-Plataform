@@ -2251,6 +2251,9 @@ img, svg, video, iframe, canvas {
 .polygon-logo{color:#8247e5;background:rgba(130,71,229,.08);border-color:rgba(130,71,229,.18)}
 .solana-logo{color:#7ef2c5;background:rgba(92,255,190,.08);border-color:rgba(92,255,190,.18)}
 .pay-card{min-width:0}
-.pay-icon{width:64px;height:40px;display:grid;place-items:center;flex:0 0 auto}
-.pay-icon svg{width:64px;height:40px;display:block}
-@media(max-width:480px){.pay-card{min-height:92px;padding:10px 7px}.pay-icon{width:58px;height:36px}.pay-icon svg{width:58px;height:36px}}
+.pay-icon{width:64px;height:64px;display:grid;place-items:center;flex:0 0 auto;border-radius:16px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);overflow:hidden}
+.pay-icon svg{width:54px;height:54px;display:block}
+.pay-icon .brand-img{width:54px;height:54px;display:block;object-fit:contain}
+.pay-icon .mpesa-img{width:58px;height:50px}
+.pay-icon .absa-img{width:52px;height:52px}
+@media(max-width:480px){.pay-card{min-height:118px;padding:12px 8px}.pay-icon{width:64px;height:64px}.pay-icon svg{width:54px;height:54px}.pay-icon .brand-img{width:54px;height:54px}.pay-icon .mpesa-img{width:58px;height:50px}.pay-icon .absa-img{width:52px;height:52px}}
