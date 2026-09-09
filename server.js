@@ -3,6 +3,7 @@ require("dotenv").config();
 const express=require("express");const path=require("path");const fs=require("fs");const crypto=require("crypto");
 const db=require("./database");
 const community=require("./community");
+const customers=require("./customers");
 const limits=require("./limits");const {router:ordersRouter,publicOrder,sendEmail,emailLayout,notify,orderDetailsHtml,recordEmail}=require("./orders");
 const app=express();const PORT=Number(process.env.PORT||3000);
 app.disable("x-powered-by");app.set("trust proxy",1);app.use(express.json({limit:"100kb"}));app.use(express.urlencoded({extended:true}));
@@ -25,11 +26,20 @@ app.get("/api/config",(req,res)=>{res.set("Cache-Control","no-store");const s=li
 app.get("/api/admin/settings",adminAuth,(req,res)=>res.json({success:true,settings:limits.get()}));
 app.put("/api/admin/rates",adminAuth,(req,res)=>{try{const rates=limits.setRates(req.body||{});res.json({success:true,rates,updatedAt:new Date().toISOString()})}catch(e){res.status(400).json({success:false,message:e.message||"Invalid rates."})}});
 app.get("/api/admin/rate-schedules",adminAuth,(req,res)=>res.json({success:true,schedules:limits.get().rateSchedules||[]}));
-app.post("/api/admin/rate-schedules",adminAuth,(req,res)=>{try{const item=limits.addRateSchedule(req.body||{});res.json({success:true,schedule:item})}catch(e){res.status(400).json({success:false,message:e.message||"Invalid schedule."})}});
+app.post("/api/admin/rate-schedules",adminAuth,(req,res)=>{try{
+ const body=req.body||{}; const item=limits.addRateSchedule(body);
+ let announcement=null;
+ if(String(body.announcement||"").trim()){
+   const start=new Date(item.effectiveAt); const end=new Date(start.getTime()+Number(item.popupDurationMinutes||1440)*60000);
+   announcement=limits.addAnnouncement(String(body.announcement).trim(),{startAt:start.toISOString(),endAt:end.toISOString(),repeatEveryMinutes:Number(body.popupRepeatMinutes||60)});
+ }
+ res.json({success:true,schedule:item,announcement});
+}catch(e){res.status(400).json({success:false,message:e.message||"Invalid schedule."})}});
 app.delete("/api/admin/rate-schedules/:id",adminAuth,(req,res)=>{const item=limits.removeRateSchedule(req.params.id);if(!item)return res.status(404).json({success:false,message:"Schedule not found."});res.json({success:true})});
 app.post("/api/admin/announcements",adminAuth,(req,res)=>{try{const item=limits.addAnnouncement(req.body.text,{startAt:req.body.startAt,endAt:req.body.endAt,repeatEveryMinutes:req.body.repeatEveryMinutes});res.json({success:true,announcement:item})}catch(e){res.status(400).json({success:false,message:e.message||"Invalid announcement."})}});
 app.get("/api/announcements",(req,res)=>{res.set("Cache-Control","no-store");const s=limits.get(),now=Date.now();const items=(s.announcements||[]).filter(x=>Date.parse(x.startAt||x.at||0)<=now && Date.parse(x.endAt||"2999-01-01")>=now).slice(-20);res.json({success:true,announcements:items,nextRateSchedule:limits.nextSchedule(now)})});
 app.put("/api/admin/settings",adminAuth,(req,res)=>res.json({success:true,settings:limits.update(req.body||{})}));
+app.get("/api/admin/customers",adminAuth,(req,res)=>{const orders=db.readOrders();const list=customers.list(orders).map(c=>{const mine=orders.filter(o=>customers.key(o.customerEmail)===c.email);const since=Date.now()-86400000;return {...c,orders24h:mine.filter(o=>Date.parse(o.createdAt||0)>=since).length,usdt24h:mine.filter(o=>Date.parse(o.createdAt||0)>=since).reduce((n,o)=>n+Number(o.amountUSDT||0),0),activeOrders:mine.filter(o=>["PENDING_PAYMENT","PAYMENT_REPORTED","PAID"].includes(o.status)).length}});res.json({success:true,customers:list})});
 app.get("/api/health",(_,res)=>res.json({success:true,service:"コイン",status:"online",emailConfigured:Boolean((process.env.SMTP_HOST&&process.env.SMTP_USER&&process.env.SMTP_PASS&&process.env.MAIL_FROM)||(process.env.RESEND_API_KEY&&process.env.MAIL_FROM&&!String(process.env.RESEND_API_KEY).startsWith("re_xxxxxxxxx"))),publicUrl:process.env.PUBLIC_URL||null,adminAuthConfigured:Boolean(process.env.ADMIN_USERNAME&&((process.env.ADMIN_PASSWORD_HASH)||(process.env.ADMIN_PASSWORD))&&process.env.ADMIN_SESSION_SECRET),time:new Date().toISOString()}));
 app.get("/api/admin/orders",adminAuth,(_,res)=>{const orders=db.readOrders().map(o=>({...publicOrder(o),hasProof:Boolean(o.proofPath),proofOriginalName:o.proofOriginalName||null,proofUploadedAt:o.proofUploadedAt||null,emailHistory:Array.isArray(o.emailLog)?o.emailLog.slice(-10):[]}));res.json({success:true,orders})});
 app.get("/api/admin/orders/:reference/proof",adminAuth,(req,res)=>{const o=db.getOrder(req.params.reference);if(!o||!o.proofPath)return res.status(404).send("Proof not found");if(!fs.existsSync(o.proofPath))return res.status(404).send("Proof file not found");res.sendFile(path.resolve(o.proofPath))});

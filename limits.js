@@ -2,7 +2,7 @@
 const fs=require("fs");const path=require("path");
 const dir=path.join(__dirname,"database");const file=path.join(dir,"settings.json");
 const DEFAULTS={
- maxActiveOrdersPerCustomer:3,maxOrdersPerCustomer24h:5,maxUSDTPerCustomer24h:100000,maxSiteOrders24h:100,maxSameAmountPerCustomer24h:2,
+ maxActiveOrdersPerCustomer:3,maxOrdersPerCustomer24h:5,maxUSDTPerCustomer24h:100000,maxSiteOrders24h:100,maxSameAmountPerCustomer24h:2,orderLimitsEnabled:true,
  blockedCountries:[],requireCountrySelection:false,
  rates:{MZN:65,AOA:950,ZAR:18.5,USD:1.02},
  rateSchedules:[],
@@ -31,7 +31,7 @@ function addRateSchedule(input){
  if(Date.parse(effectiveAt)<=Date.now()) throw new Error("Schedule time must be in the future.");
  const rates={...currentRates(),...input.rates};
  for(const k of ["MZN","AOA","ZAR","USD"]){const n=Number(rates[k]);if(!Number.isFinite(n)||n<=0)throw new Error("All rates must be greater than zero.");rates[k]=n}
- const item={id:require("crypto").randomUUID(),effectiveAt,rates,announcement:String(input.announcement||"").trim().slice(0,300),createdAt:new Date().toISOString()};
+ const item={id:require("crypto").randomUUID(),effectiveAt,rates,announcement:String(input.announcement||"").trim().slice(0,300),popupDurationMinutes:Math.max(1,Math.min(10080,Number(input.popupDurationMinutes)||1440)),popupRepeatMinutes:Math.max(1,Math.min(10080,Number(input.popupRepeatMinutes)||60)),createdAt:new Date().toISOString()};
  d.rateSchedules=(d.rateSchedules||[]).filter(x=>x.id!==item.id).concat(item).sort((a,b)=>Date.parse(a.effectiveAt)-Date.parse(b.effectiveAt)).slice(-100);
  write(d); return item;
 }
@@ -47,7 +47,7 @@ function addAnnouncement(text,input={}){
  if(Date.parse(endAt)<=Date.parse(startAt))throw new Error("End time must be after start time.");
  d.announcements=(d.announcements||[]).concat(item).slice(-200);write(d);return item;
 }
-function update(patch){const next={...read(),...patch};next.maxActiveOrdersPerCustomer=Math.max(0,Math.min(100,Number(next.maxActiveOrdersPerCustomer)||0));next.maxOrdersPerCustomer24h=Math.max(0,Math.min(1000,Number(next.maxOrdersPerCustomer24h)||0));next.maxUSDTPerCustomer24h=Math.max(0,Math.min(10000000,Number(next.maxUSDTPerCustomer24h)||0));next.maxSiteOrders24h=Math.max(0,Math.min(100000,Number(next.maxSiteOrders24h)||0));next.maxSameAmountPerCustomer24h=Math.max(0,Math.min(20,Number(next.maxSameAmountPerCustomer24h)||0));next.blockedCountries=Array.isArray(next.blockedCountries)?next.blockedCountries.map(x=>String(x).toUpperCase().trim()).filter(Boolean).slice(0,30):[];next.requireCountrySelection=Boolean(next.requireCountrySelection);
+function update(patch){const next={...read(),...patch};next.maxActiveOrdersPerCustomer=Math.max(0,Math.min(100,Number(next.maxActiveOrdersPerCustomer)||0));next.maxOrdersPerCustomer24h=Math.max(0,Math.min(1000,Number(next.maxOrdersPerCustomer24h)||0));next.maxUSDTPerCustomer24h=Math.max(0,Math.min(10000000,Number(next.maxUSDTPerCustomer24h)||0));next.maxSiteOrders24h=Math.max(0,Math.min(100000,Number(next.maxSiteOrders24h)||0));next.maxSameAmountPerCustomer24h=Math.max(0,Math.min(20,Number(next.maxSameAmountPerCustomer24h)||0));next.orderLimitsEnabled=Boolean(next.orderLimitsEnabled);next.blockedCountries=Array.isArray(next.blockedCountries)?next.blockedCountries.map(x=>String(x).toUpperCase().trim()).filter(Boolean).slice(0,30):[];next.requireCountrySelection=Boolean(next.requireCountrySelection);
  next.rates={...DEFAULTS.rates,...(next.rates||{})};
  next.rateSchedules=Array.isArray(next.rateSchedules)?next.rateSchedules.slice(-100):[];
  next.announcements=Array.isArray(next.announcements)?next.announcements.slice(-200):[];
