@@ -1,7 +1,8 @@
 require("dotenv").config();
 "use strict";
 const express=require("express");const path=require("path");const fs=require("fs");const crypto=require("crypto");
-const db=require("./database");const {router:ordersRouter,publicOrder,sendEmail,emailLayout,notify,orderDetailsHtml,recordEmail}=require("./orders");
+const db=require("./database");
+const community=require("./community");const {router:ordersRouter,publicOrder,sendEmail,emailLayout,notify,orderDetailsHtml,recordEmail}=require("./orders");
 const app=express();const PORT=Number(process.env.PORT||3000);
 app.disable("x-powered-by");app.set("trust proxy",1);app.use(express.json({limit:"100kb"}));app.use(express.urlencoded({extended:true}));
 const ADMIN_USER=process.env.ADMIN_USERNAME||"Jay";const ADMIN_PASS=process.env.ADMIN_PASSWORD||"";const ADMIN_HASH=process.env.ADMIN_PASSWORD_HASH||"";const SESSION_SECRET=process.env.ADMIN_SESSION_SECRET||"";const COOKIE="koin_admin_session";const attempts=new Map();
@@ -14,6 +15,8 @@ app.post("/api/admin/login",(req,res)=>{const ip=req.ip||"unknown";if(!rateLimit
 app.post("/api/admin/logout",(req,res)=>{res.setHeader("Set-Cookie",`${COOKIE}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0${process.env.NODE_ENV==="production"?"; Secure":""}`);res.json({success:true})});
 app.get("/api/admin/session",(req,res)=>res.json({success:true,authenticated:verifySession(cookies(req)[COOKIE])}));
 app.use("/api/orders",ordersRouter);
+app.get("/api/community/messages",(req,res)=>{const room=String(req.query.room||"general").slice(0,80);res.json({success:true,messages:community.listMessages(room)});});
+app.post("/api/community/messages",(req,res)=>{const text=String(req.body.text||"").trim();const name=String(req.body.name||"Guest").trim()||"Guest";const room=String(req.body.room||"general").slice(0,80);if(!text)return res.status(400).json({success:false,message:"Message is required."});res.json({success:true,message:community.addMessage({room,name,text})});});
 app.get("/api/health",(_,res)=>res.json({success:true,service:"コイン",status:"online",emailConfigured:Boolean((process.env.SMTP_HOST&&process.env.SMTP_USER&&process.env.SMTP_PASS&&process.env.MAIL_FROM)||(process.env.RESEND_API_KEY&&process.env.MAIL_FROM&&!String(process.env.RESEND_API_KEY).startsWith("re_xxxxxxxxx"))),publicUrl:process.env.PUBLIC_URL||null,adminAuthConfigured:Boolean(process.env.ADMIN_USERNAME&&((process.env.ADMIN_PASSWORD_HASH)||(process.env.ADMIN_PASSWORD))&&process.env.ADMIN_SESSION_SECRET),time:new Date().toISOString()}));
 app.get("/api/admin/orders",adminAuth,(_,res)=>{const orders=db.readOrders().map(o=>({...publicOrder(o),hasProof:Boolean(o.proofPath),proofOriginalName:o.proofOriginalName||null,proofUploadedAt:o.proofUploadedAt||null,emailHistory:Array.isArray(o.emailLog)?o.emailLog.slice(-10):[]}));res.json({success:true,orders})});
 app.get("/api/admin/orders/:reference/proof",adminAuth,(req,res)=>{const o=db.getOrder(req.params.reference);if(!o||!o.proofPath)return res.status(404).send("Proof not found");if(!fs.existsSync(o.proofPath))return res.status(404).send("Proof file not found");res.sendFile(path.resolve(o.proofPath))});

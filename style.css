@@ -2269,3 +2269,52 @@ img, svg, video, iframe, canvas {
 .chart-cycle-note{display:flex;align-items:center;gap:7px;margin-top:10px;color:var(--muted-2);font-size:9px;text-transform:uppercase;letter-spacing:1px}
 .chart-cycle-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px rgba(32,201,151,.7)}
 .nav-p2p,.p2p-home-btn{border-color:rgba(32,201,151,.28)!important;color:#a7f4dc!important}
+
+/* KOIN mobile CTA polish */
+@media(max-width:600px){.hero-buttons{flex-direction:column!important;width:100%!important}.hero-buttons .primary-button,.hero-buttons .secondary-button{width:100%!important;display:flex!important;min-height:48px!important;box-sizing:border-box}.hero-buttons a{box-sizing:border-box}.hero-buttons .secondary-button{border:1px solid var(--border)!important;background:rgba(255,255,255,.045)!important;box-shadow:0 8px 24px rgba(0,0,0,.16)!important}.hero-buttons .primary-button{box-shadow:0 10px 28px rgba(32,201,151,.14)!important}}
+
+/* KOIN — mobile action row polish */
+@media (max-width: 600px){
+  .hero-buttons{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+    width:100%!important;
+    margin-top:22px!important;
+  }
+  .hero-buttons > a,
+  .hero-buttons > button{
+    width:100%!important;
+    min-width:0!important;
+    min-height:52px!important;
+    padding:0 12px!important;
+    box-sizing:border-box!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    text-align:center!important;
+    white-space:normal!important;
+    border-radius:12px!important;
+    font-size:12px!important;
+    font-weight:700!important;
+    line-height:1.15!important;
+    text-decoration:none!important;
+    overflow:hidden!important;
+  }
+  .hero-buttons .primary-button{
+    background:var(--accent)!important;
+    color:#05110c!important;
+    border:1px solid transparent!important;
+    box-shadow:0 10px 28px rgba(32,201,151,.14)!important;
+  }
+  .hero-buttons .secondary-button,
+  .hero-buttons a:not(.primary-button){
+    background:rgba(255,255,255,.045)!important;
+    color:var(--text)!important;
+    border:1px solid var(--border)!important;
+    box-shadow:0 8px 24px rgba(0,0,0,.16)!important;
+  }
+}
+@media (max-width: 420px){
+  .hero-buttons{grid-template-columns:1fr!important;}
+}
