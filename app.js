@@ -40,17 +40,23 @@ async function syncPlatformConfig(showChange=true){
   if(d.nextRateSchedule)localStorage.setItem('koinNextRateSchedule',JSON.stringify(d.nextRateSchedule)); else localStorage.removeItem('koinNextRateSchedule');
  }catch{}
 }
-function showPlatformNotice(title,text){
+function showPlatformNotice(title,text,announcementId=null){
  let box=$('platformNotice'); if(!box){box=document.createElement('div');box.id='platformNotice';box.className='platform-notice';document.body.appendChild(box);}
- box.innerHTML='<div class="platform-notice-icon">!</div><div><strong>'+escapeHtml(title)+'</strong><p>'+escapeHtml(text)+'</p></div><button aria-label="Close" onclick="this.parentElement.classList.remove(\"show\")">×</button>';
- box.classList.add('show'); clearTimeout(window.__noticeTimer); window.__noticeTimer=setTimeout(()=>box.classList.remove('show'),8000);
+ box.innerHTML='<div class="platform-notice-icon">!</div><div class="platform-notice-content"><strong>'+escapeHtml(title)+'</strong><p>'+escapeHtml(text)+'</p></div><button class="platform-notice-ok" aria-label="OK">OK</button>';
+ box.classList.add('show');
+ const ok=box.querySelector('.platform-notice-ok');
+ if(ok) ok.onclick=()=>{box.classList.remove('show');if(announcementId)localStorage.setItem('koinNoticeLast_'+announcementId,String(Date.now()));};
 }
 async function syncAnnouncements(){
  try{
   const r=await fetch('/api/announcements?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;const d=await r.json();
-  const seen=JSON.parse(localStorage.getItem('koinSeenAnnouncements')||'[]');
-  const fresh=(d.announcements||[]).filter(x=>x.id&&!seen.includes(x.id));
-  if(fresh.length){const a=fresh[fresh.length-1];showPlatformNotice('Notice',a.text);localStorage.setItem('koinSeenAnnouncements',JSON.stringify(seen.concat(fresh.map(x=>x.id)).slice(-30)))}
+  const now=Date.now();
+  const active=(d.announcements||[]).filter(x=>x.id&&Date.parse(x.startAt||x.at||0)<=now&&Date.parse(x.endAt||'2999-01-01')>=now);
+  for(const a of active){
+   const repeat=Math.max(1,Number(a.repeatEveryMinutes)||60)*60000;
+   const last=Number(localStorage.getItem('koinNoticeLast_'+a.id)||0);
+   if(now-last>=repeat){showPlatformNotice('KOIN notice',a.text,a.id);localStorage.setItem('koinNoticeLast_'+a.id,String(now));break;}
+  }
  }catch{}
 }
 
