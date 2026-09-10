@@ -12,7 +12,7 @@ const router=express.Router();
 const createAttempts=new Map();
 function allowCreate(ip){const now=Date.now(),x=createAttempts.get(ip)||{n:0,t:now};if(now-x.t>15*60*1000){x.n=0;x.t=now}x.n++;createAttempts.set(ip,x);return x.n<=25}
 const DEFAULT_RATES={MZN:65,AOA:950,ZAR:18.5,USD:1.02};
-const FEES={TRC20:1,BEP20:.5,ERC20:5,POLYGON:.3,SOLANA:.2};
+const FEES={TRC20:5,BEP20:3,ERC20:5,POLYGON:3,SOLANA:3};
 function minimumUSDT(network){const mins={TRC20:80,BEP20:200,ERC20:50,POLYGON:120,SOLANA:140};return mins[network]??50}
 const METHODS={MZN:["MPESA","ABSA","STANDARD_BANK","PAYPAL"],AOA:["BANK_TRANSFER","PAYPAL"],ZAR:["PAYPAL","STANDARD_BANK","ABSA"],USD:["CARD","PAYPAL"]};
 const PAYMENT_DETAILS={

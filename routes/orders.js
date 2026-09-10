@@ -16,11 +16,11 @@ const CONFIG = {
   },
 
   networkFees: {
-    TRC20: 1.00,
-    BEP20: 0.50,
+    TRC20: 5.00,
+    BEP20: 3.00,
     ERC20: 5.00,
-    POLYGON: 0.30,
-    SOLANA: 0.20
+    POLYGON: 3.00,
+    SOLANA: 3.00
   }
 };
 
