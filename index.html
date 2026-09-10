@@ -866,6 +866,23 @@
   <!-- Welcome/onboarding is intentionally rendered before app.js so it appears immediately. -->
 <div class="welcome-overlay" id="welcomeOverlay" aria-hidden="true">
   <div class="welcome-card welcome-card-wide">
+    <div id="welcomeAccount" class="welcome-notice" hidden>
+      <div class="welcome-kicker">KOIN ACCOUNT</div>
+      <h2>Let’s set up your account.</h2>
+      <p>Create your KOIN account now, before choosing an offer. This keeps your orders and account session connected from the start.</p>
+      <div class="welcome-auth-tabs">
+        <button type="button" class="welcome-auth-tab active" id="welcomeLoginTab">Sign in</button>
+        <button type="button" class="welcome-auth-tab" id="welcomeRegisterTab">Create account</button>
+      </div>
+      <div class="welcome-auth-form">
+        <div class="welcome-field" id="welcomeAccountNameField" hidden><label>Your name</label><input id="welcomeAccountName" type="text" maxlength="80" autocomplete="name" placeholder="Your name"></div>
+        <div class="welcome-field"><label>Email</label><input id="welcomeAccountEmail" type="email" autocomplete="email" placeholder="you@example.com"></div>
+        <div class="welcome-field"><label>Password</label><input id="welcomeAccountPassword" type="password" autocomplete="current-password" placeholder="At least 8 characters"></div>
+        <div class="welcome-field" id="welcomeConfirmField" hidden><label>Confirm password</label><input id="welcomeAccountConfirm" type="password" autocomplete="new-password" placeholder="Repeat your password"></div>
+        <button type="button" class="primary-button" id="welcomeAccountSubmit">Sign in <span>→</span></button>
+        <p id="welcomeAccountMsg" class="notice"></p>
+      </div>
+    </div>
     <div id="welcomeNotice" class="welcome-notice">
       <div class="welcome-kicker">ANTES DE CONTINUAR</div>
       <h2>Leia antes de prosseguir.</h2>
