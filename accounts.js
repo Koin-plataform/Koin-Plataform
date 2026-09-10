@@ -1,0 +1,17 @@
+"use strict";
+const fs=require("fs"),path=require("path"),crypto=require("crypto");
+const dir=path.join(__dirname,"database"),file=path.join(dir,"accounts.json");
+const sessions=new Map();
+function ensure(){if(!fs.existsSync(dir))fs.mkdirSync(dir,{recursive:true});if(!fs.existsSync(file))fs.writeFileSync(file,"[]","utf8");}
+function read(){ensure();try{const x=JSON.parse(fs.readFileSync(file,"utf8")||"[]");return Array.isArray(x)?x:[]}catch{return[]}}
+function write(x){ensure();const tmp=file+".tmp";fs.writeFileSync(tmp,JSON.stringify(x,null,2));fs.renameSync(tmp,file)}
+function id(){return "KAC-"+crypto.randomBytes(6).toString("hex").toUpperCase()}
+function hash(password,salt=crypto.randomBytes(16).toString("hex")){return {salt,hash:crypto.scryptSync(password,salt,64).toString("hex")}}
+function safe(a){if(!a)return null;return {id:a.id,name:a.name,email:a.email,createdAt:a.createdAt,paymentMethods:(a.paymentMethods||[]).map(({id,type,label,brand,last4,market,createdAt})=>({id,type,label,brand,last4,market,createdAt}))}}
+async function register({name,email,password}){const all=read();if(all.some(a=>a.email===email))throw Error("An account with this email already exists.");const h=hash(password);const a={id:id(),name,email,passwordHash:h.hash,passwordSalt:h.salt,createdAt:new Date().toISOString(),paymentMethods:[]};all.push(a);write(all);return safe(a)}
+async function authenticate(email,password){const a=read().find(x=>x.email===email);if(!a)return null;const h=crypto.scryptSync(password,a.passwordSalt,64).toString("hex");if(!crypto.timingSafeEqual(Buffer.from(h),Buffer.from(a.passwordHash)))return null;return safe(a)}
+function createToken(accountId){const t=crypto.randomBytes(32).toString("hex");sessions.set(t,{accountId,expires:Date.now()+7*86400000});return t}
+async function fromToken(token){if(!token)return null;const s=sessions.get(token);if(!s||s.expires<Date.now()){sessions.delete(token);return null}return safe(read().find(a=>a.id===s.accountId))}
+async function addPaymentMethod(accountId,body){const type=String(body.type||"").toUpperCase();const allowed=["CARD","MPESA","BANK_TRANSFER","PAYPAL"];if(!allowed.includes(type))throw Error("Unsupported payment method.");if(type==="CARD"&&body.number)throw Error("Raw card numbers are not stored by KOIN. Use a supported payment provider to tokenize cards.");const all=read(),a=all.find(x=>x.id===accountId);if(!a)throw Error("Account not found.");const m={id:"PM-"+crypto.randomBytes(5).toString("hex"),type,label:String(body.label||type).trim().slice(0,60)||type,brand:String(body.brand||"").trim().slice(0,30),last4:String(body.last4||"").replace(/\D/g,"").slice(-4),market:String(body.market||"").trim().slice(0,8),createdAt:new Date().toISOString()};a.paymentMethods=a.paymentMethods||[];a.paymentMethods.push(m);write(all);return m}
+async function removePaymentMethod(accountId,methodId){const all=read(),a=all.find(x=>x.id===accountId);if(!a)return false;const before=(a.paymentMethods||[]).length;a.paymentMethods=(a.paymentMethods||[]).filter(m=>m.id!==methodId);if(a.paymentMethods.length===before)return false;write(all);return true}
+module.exports={register,authenticate,createToken,fromToken,addPaymentMethod,removePaymentMethod};

@@ -32,3 +32,13 @@ Only the operator can confirm payment and complete the transfer with a TXID.
 
 RESPONSIVE
 The customer pages and operator panel adapt to desktop, tablet and mobile screens.
+
+KOIN V20 additions
+- Optional customer account with sign up/sign in.
+- Saved payment-method metadata (never raw card number or CVV).
+- Account order history by email.
+- Learn page covering crypto arbitrage types and a net-profit calculator.
+- Updated customer-facing wording to describe KOIN service fee separately from blockchain/network costs.
+- Account balance/custody is NOT enabled in this version.
+
+Production note: connect a compliant payment processor for real card tokenization/charging. Do not collect raw card data in KOIN.
