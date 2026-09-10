@@ -73,5 +73,10 @@ function add(input={}){
 }
 function remove(id){const d=read();const old=d.offers||[];const item=old.find(x=>x.id===id);d.offers=old.filter(x=>x.id!==id);write(d);return item||null;}
 function updateOffer(id,input={}){const d=read();const idx=(d.offers||[]).findIndex(x=>x.id===id);if(idx<0)return null;const old=d.offers[idx];const next={...old,...input,updatedAt:new Date().toISOString()};if(input.price!==undefined){next.price=Number(input.price);if(!Number.isFinite(next.price)||next.price<=0)throw new Error("Offer price must be greater than zero.")}if(input.countries)next.countries=input.countries.map(x=>clean(x,8).toUpperCase()).filter(Boolean);if(input.offerNeeds)next.offerNeeds=input.offerNeeds.map(x=>clean(x,40)).filter(Boolean);if(input.startAt)next.startAt=new Date(input.startAt).toISOString();if(input.endAt)next.endAt=new Date(input.endAt).toISOString();d.offers[idx]=next;write(d);return next;}
+function getOffer(id,answers={}){
+ const d=read(); const o=(d.offers||[]).find(x=>x.id===id);
+ if(!o||!isActive(o,Date.now())||!matches(o,normalize(answers)))return null;
+ return publicOffer(o);
+}
 function settings(patch={}){const d=read();if(patch.enabled!==undefined)d.enabled=Boolean(patch.enabled);if(patch.rotateOnRefresh!==undefined)d.rotateOnRefresh=Boolean(patch.rotateOnRefresh);if(patch.requireOnboarding!==undefined)d.requireOnboarding=Boolean(patch.requireOnboarding);if(patch.supportUrl!==undefined)d.supportUrl=clean(patch.supportUrl,200)||"contact.html";write(d);return d;}
-module.exports={file,get,settings,add,remove,updateOffer,recommend,listMatching,publicOffer};
+module.exports={file,get,settings,add,remove,updateOffer,recommend,listMatching,publicOffer,getOffer};

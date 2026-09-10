@@ -2338,3 +2338,10 @@ img, svg, video, iframe, canvas {
 .welcome-card-wide{width:min(560px,100%)}.welcome-notice p{color:#84929e;font-size:11px;line-height:1.6;margin:10px 0}.welcome-notice-actions{display:flex;gap:9px;margin-top:18px}.welcome-notice-actions .primary-button,.welcome-notice-actions .secondary-button{flex:1;justify-content:center;text-align:center}.welcome-input{width:100%;height:52px;box-sizing:border-box;border:1px solid #2b3946;border-radius:12px;background:#0a1016;color:#eef3f6;padding:0 15px;outline:none;font-size:13px}.welcome-input:focus{border-color:#20c997;box-shadow:0 0 0 3px rgba(32,201,151,.08)}.welcome-next{display:flex;width:100%;justify-content:center;margin-top:11px}.welcome-step[hidden],#welcomeQuiz[hidden],#welcomeNotice[hidden]{display:none!important}
 @media(max-width:850px){.offer-shell{grid-template-columns:1fr}.recommended-offer-card{grid-template-columns:1fr}}
 @media(max-width:520px){.offer-copy,.recommended-offer-card{padding:16px}.offer-copy h2{font-size:24px}.welcome-notice-actions{flex-direction:column}.welcome-card-wide{padding:20px}.welcome-notice-actions .primary-button,.welcome-notice-actions .secondary-button{width:100%}}
+
+/* KOIN V15 */
+.price-toast{left:auto!important;right:18px!important;top:auto!important;bottom:18px!important;transform:translateY(18px)!important;width:min(360px,calc(100vw - 36px))!important}.price-toast.show{left:auto!important;right:18px!important;top:auto!important;bottom:18px!important;transform:translateY(0)!important}.use-offer{border:0;cursor:pointer}@media(max-width:600px){.price-toast{right:14px!important;bottom:14px!important;width:calc(100vw - 28px)!important}}
+
+.order-actions-row{display:flex;gap:9px;margin-top:12px}.order-actions-row>*{flex:1}@media(max-width:520px){.order-actions-row{flex-direction:column}}
+
+.checkout-currency-home{height:44px;width:100%;box-sizing:border-box;background:#080c11;border:1px solid #26323e;border-radius:10px;color:#eef2f6;padding:0 12px;outline:none}.checkout-currency-home:focus{border-color:#20c997;box-shadow:0 0 0 3px rgba(32,201,151,.08)}

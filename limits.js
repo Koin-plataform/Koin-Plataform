@@ -1,6 +1,6 @@
 "use strict";
 const fs=require("fs");const path=require("path");
-const dir=path.join(__dirname,"database");const file=path.join(dir,"settings.json");
+const dir=path.join(__dirname,"database");const file=path.join(dir,"settings.json");const crypto=require("crypto");
 const DEFAULTS={
  maxActiveOrdersPerCustomer:3,maxOrdersPerCustomer24h:5,maxUSDTPerCustomer24h:100000,maxSiteOrders24h:100,maxSameAmountPerCustomer24h:2,orderLimitsEnabled:true,
  blockedCountries:[],requireCountrySelection:false,
@@ -26,6 +26,7 @@ function setRates(rates){
  const d=read(); d.rates={...DEFAULTS.rates,...(d.rates||{}),...rates};
  write(d); return d.rates;
 }
+function rateVersion(at=Date.now()){return crypto.createHash("sha1").update(JSON.stringify(currentRates(at))).digest("hex").slice(0,12)}
 function addRateSchedule(input){
  const d=read(); const effectiveAt=new Date(input.effectiveAt).toISOString();
  if(Date.parse(effectiveAt)<=Date.now()) throw new Error("Schedule time must be in the future.");
@@ -52,4 +53,4 @@ function update(patch){const next={...read(),...patch};next.maxActiveOrdersPerCu
  next.rateSchedules=Array.isArray(next.rateSchedules)?next.rateSchedules.slice(-100):[];
  next.announcements=Array.isArray(next.announcements)?next.announcements.slice(-200):[];
  write(next);return next}
-module.exports={get,update,file,DEFAULTS,currentRates,nextSchedule,setRates,addRateSchedule,removeRateSchedule,addAnnouncement};
+module.exports={get,update,file,DEFAULTS,currentRates,rateVersion,nextSchedule,setRates,addRateSchedule,removeRateSchedule,addAnnouncement};
