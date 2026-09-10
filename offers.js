@@ -14,12 +14,27 @@ const DEFAULTS={
 };
 function seedDefaults(){
  const base=[
-  ["MZN","Oferta MZN — Compra rápida",66,"buy","any","any"],["MZN","Oferta MZN — Melhor preço",67,"best_price","any","any"],["MZN","Oferta MZN — Arbitragem",68,"best_price","any","arbitrage"],["MZN","Oferta MZN — Comercial",69,"buy","any","commercial"],
-  ["AOA","Oferta AOA — Compra rápida",955,"buy","any","any"],["AOA","Oferta AOA — Melhor preço",960,"best_price","any","any"],["AOA","Oferta AOA — Arbitragem",965,"best_price","any","arbitrage"],["AOA","Oferta AOA — Comercial",970,"buy","any","commercial"],
-  ["ZAR","Oferta ZAR — Compra rápida",19,"buy","any","any"],["ZAR","Oferta ZAR — Melhor preço",20,"best_price","any","any"],["ZAR","Oferta ZAR — Arbitragem",21,"best_price","any","arbitrage"],["ZAR","Oferta ZAR — Comercial",19,"buy","any","commercial"],
-  ["USD","Oferta USD — Compra rápida",1.03,"buy","any","any"],["USD","Oferta USD — Melhor preço",1.04,"best_price","any","any"],["USD","Oferta USD — Arbitragem",1.05,"best_price","any","arbitrage"],["USD","Oferta USD — Comercial",1.03,"buy","any","commercial"]
+  ["MZN","Oferta MZN — Compra rápida",68,"buy","any","any",5],
+  ["MZN","Oferta MZN — Arbitragem",65,"best_price","any","arbitrage",30],
+  ["MZN","Oferta MZN — Pessoal",67,"buy","any","personal",30],
+  ["MZN","Oferta MZN — Comercial",70,"buy","any","commercial",30],
+
+  ["AOA","Oferta AOA — Compra rápida",975,"buy","any","any",5],
+  ["AOA","Oferta AOA — Arbitragem",950,"best_price","any","arbitrage",30],
+  ["AOA","Oferta AOA — Pessoal",975,"buy","any","personal",30],
+  ["AOA","Oferta AOA — Comercial",1000,"buy","any","commercial",30],
+
+  ["ZAR","Oferta ZAR — Compra rápida",20,"buy","any","any",5],
+  ["ZAR","Oferta ZAR — Arbitragem",18.5,"best_price","any","arbitrage",30],
+  ["ZAR","Oferta ZAR — Pessoal",20,"buy","any","personal",30],
+  ["ZAR","Oferta ZAR — Comercial",22,"buy","any","commercial",30],
+
+  ["USD","Oferta USD — Compra rápida",1.06,"buy","any","any",5],
+  ["USD","Oferta USD — Arbitragem",1.02,"best_price","any","arbitrage",30],
+  ["USD","Oferta USD — Pessoal",1.06,"buy","any","personal",30],
+  ["USD","Oferta USD — Comercial",1.10,"buy","any","commercial",30]
  ];
- return base.map((x,i)=>({id:"OFF-DEFAULT-"+(i+1),title:x[1],label:"Oferta KOIN",countries:[x[0]],currency:x[0],price:x[2],unit:"per USDT",offerNeeds:[x[3]],firstTime:x[4],useCase:x[5],network:"",note:"Oferta padrão editável no painel KOIN.",priority:10,active:true,startAt:null,endAt:null,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}));
+ return base.map((x,i)=>({id:"OFF-DEFAULT-"+(i+1),title:x[1],label:"Oferta KOIN",countries:[x[0]],currency:x[0],price:x[2],unit:"per USDT",offerNeeds:[x[3]],firstTime:x[4],useCase:x[5],network:"",note:"Oferta padrão editável no painel KOIN.",priority:x[6],active:true,startAt:null,endAt:null,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}));
 }
 function ensure(){if(!fs.existsSync(dir))fs.mkdirSync(dir,{recursive:true});if(!fs.existsSync(file)){const d={...DEFAULTS,version:1,offers:seedDefaults()};fs.writeFileSync(file,JSON.stringify(d,null,2));}}
 function read(){ensure();try{const x=JSON.parse(fs.readFileSync(file,"utf8"))||{};const d={...DEFAULTS,...x,offers:Array.isArray(x.offers)&&x.offers.length?x.offers:seedDefaults()};return migrateDefaults(d)}catch{return {...DEFAULTS,offers:seedDefaults()}}}
@@ -58,7 +73,7 @@ function recommend(answers={},seed=0){
  const n=Math.max(0,Number(seed)||0);const shift=n%list.length;const rotated=list.slice(shift).concat(list.slice(0,shift));return rotated.slice(0,3);
 }
 const PRICE_RULES={MZN:{min:65,max:70,step:1},AOA:{min:950,max:1000,step:1},ZAR:{min:18.5,max:22,step:1},USD:{min:1.02,max:1.1,step:0.01}};
-function validatePrice(currency,price){const c=String(currency||"MZN").toUpperCase();const r=PRICE_RULES[c];if(!r)return;const n=Number(price);if(!Number.isFinite(n)||n<=r.min||n>=r.max)throw new Error(`Preço ${c} deve ser maior que ${r.min} e menor que ${r.max}.`);const scaled=Math.round((n/r.step))*r.step;if(Math.abs(n-scaled)>1e-9)throw new Error(`Preço ${c} deve usar valores redondos.`);}
+function validatePrice(currency,price){const c=String(currency||"MZN").toUpperCase();const r=PRICE_RULES[c];if(!r)return;const n=Number(price);if(!Number.isFinite(n)||n<r.min||n>r.max)throw new Error(`Preço ${c} deve estar entre ${r.min} e ${r.max}.`);const decimals=r.step<1?2:0;const rounded=Number(n.toFixed(decimals));if(Math.abs(n-rounded)>1e-9)throw new Error(`Preço ${c} deve usar valores redondos.`);const steps=(n-r.min)/r.step;if(Math.abs(steps-Math.round(steps))>1e-9)throw new Error(`Preço ${c} deve respeitar o intervalo definido.`);}
 function migrateDefaults(d){
  let changed=false;
  const defaults=seedDefaults();
