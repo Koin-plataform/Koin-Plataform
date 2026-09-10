@@ -1,6 +1,6 @@
 "use strict";
-const fs=require("fs");const path=require("path");
-const dir=path.join(__dirname,"database");const file=path.join(dir,"orders.json");
+const fs=require("fs");const storage=require("./storage");const path=require("path");
+const dir=storage.DATA_DIR;const file=path.join(dir,"orders.json");
 function ensureDatabase(){if(!fs.existsSync(dir))fs.mkdirSync(dir,{recursive:true});if(!fs.existsSync(file))fs.writeFileSync(file,"[]","utf8");}
 function readOrders(){ensureDatabase();try{const raw=fs.readFileSync(file,"utf8");const data=JSON.parse(raw||"[]");return Array.isArray(data)?data:[];}catch(e){console.error("Database read error:",e.message);return[];}}
 function writeOrders(orders){ensureDatabase();const tmp=file+".tmp";fs.writeFileSync(tmp,JSON.stringify(orders,null,2),"utf8");fs.renameSync(tmp,file);}

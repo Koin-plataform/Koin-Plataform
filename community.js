@@ -1,6 +1,6 @@
 "use strict";
 const fs=require("fs"),path=require("path"),crypto=require("crypto");
-const dir=path.join(__dirname,"database");
+const dir=storage.DATA_DIR;
 const file=path.join(dir,"community.json");
 function ensure(){if(!fs.existsSync(dir))fs.mkdirSync(dir,{recursive:true});if(!fs.existsSync(file))fs.writeFileSync(file,JSON.stringify({messages:[],offers:[]},null,2));}
 function read(){ensure();try{return JSON.parse(fs.readFileSync(file,"utf8"))||{messages:[],offers:[]}}catch{return {messages:[],offers:[]}}}

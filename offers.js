@@ -1,8 +1,8 @@
 "use strict";
-const fs=require("fs");
+const fs=require("fs");const storage=require("./storage");
 const path=require("path");
 const crypto=require("crypto");
-const dir=path.join(__dirname,"database");
+const dir=storage.DATA_DIR;
 const file=path.join(dir,"offers.json");
 const DEFAULTS={
   enabled:true,

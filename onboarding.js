@@ -1,6 +1,6 @@
 "use strict";
-const fs=require("fs");const path=require("path");const crypto=require("crypto");
-const dir=path.join(__dirname,"database");const file=path.join(dir,"onboarding.json");
+const fs=require("fs");const storage=require("./storage");const path=require("path");const crypto=require("crypto");
+const dir=storage.DATA_DIR;const file=path.join(dir,"onboarding.json");
 function ensure(){if(!fs.existsSync(dir))fs.mkdirSync(dir,{recursive:true});if(!fs.existsSync(file))fs.writeFileSync(file,"[]")}
 function read(){ensure();try{return JSON.parse(fs.readFileSync(file,"utf8"))||[]}catch{return[]}}
 function write(d){ensure();const tmp=file+".tmp";fs.writeFileSync(tmp,JSON.stringify(d,null,2));fs.renameSync(tmp,file)}

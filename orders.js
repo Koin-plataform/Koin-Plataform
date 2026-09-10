@@ -6,6 +6,7 @@ const fs=require("fs");
 const path=require("path");
 const crypto=require("crypto");
 const db=require("./database");
+const storage=require("./storage");
 const limits=require("./limits");
 const customers=require("./customers");const offers=require("./offers");
 const router=express.Router();
@@ -23,7 +24,7 @@ const PAYMENT_DETAILS={
  STANDARD_BANK:{label:"Standard Bank",title:"Standard Bank transfer",fields:["Account name","Account number","Branch"],values:[process.env.STANDARD_BANK_ACCOUNT_NAME||"KOIN TEST",process.env.STANDARD_BANK_ACCOUNT||"0000000000",process.env.STANDARD_BANK_BRANCH||"0000"],instruction:"Make the transfer using the details above, then upload your payment proof."},
  CARD:{label:"Card",title:"Card payment",fields:["Payment page"],values:[process.env.CARD_PAYMENT_URL||"Payment gateway not configured"],instruction:"Complete the card payment through the configured gateway, then upload your payment proof."}
 };
-const proofDir=path.join(__dirname,"uploads","proofs");
+const proofDir=storage.PROOFS_DIR;
 fs.mkdirSync(proofDir,{recursive:true});
 const upload=multer({storage:multer.diskStorage({destination:(_,__,cb)=>cb(null,proofDir),filename:(_,file,cb)=>cb(null,Date.now()+"-"+crypto.randomBytes(6).toString("hex")+path.extname(file.originalname).toLowerCase())}),limits:{fileSize:5*1024*1024},fileFilter:(_,file,cb)=>cb(null,["image/jpeg","image/png","image/webp","application/pdf"].includes(file.mimetype))});
 function ref(){return "KOIN-"+new Date().toISOString().slice(0,10).replace(/-/g,"")+"-"+crypto.randomBytes(3).toString("hex").toUpperCase()}
