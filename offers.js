@@ -9,11 +9,21 @@ const DEFAULTS={
   rotateOnRefresh:true,
   requireOnboarding:true,
   supportUrl:"contact.html",
+  version:1,
   offers:[]
 };
-function ensure(){if(!fs.existsSync(dir))fs.mkdirSync(dir,{recursive:true});if(!fs.existsSync(file))fs.writeFileSync(file,JSON.stringify(DEFAULTS,null,2));}
-function read(){ensure();try{return {...DEFAULTS,...JSON.parse(fs.readFileSync(file,"utf8"))}}catch{return {...DEFAULTS}}}
-function write(d){ensure();const tmp=file+".tmp";fs.writeFileSync(tmp,JSON.stringify({...DEFAULTS,...d},null,2));fs.renameSync(tmp,file)}
+function seedDefaults(){
+ const base=[
+  ["MZN","Oferta MZN — Compra rápida",64.90,"buy","any","any"],["MZN","Oferta MZN — Melhor preço",64.50,"best_price","any","any"],["MZN","Oferta MZN — Arbitragem",64.20,"best_price","any","arbitrage"],["MZN","Oferta MZN — Comercial",64.70,"buy","any","commercial"],
+  ["AOA","Oferta AOA — Compra rápida",945,"buy","any","any"],["AOA","Oferta AOA — Melhor preço",940,"best_price","any","any"],["AOA","Oferta AOA — Arbitragem",935,"best_price","any","arbitrage"],["AOA","Oferta AOA — Comercial",942,"buy","any","commercial"],
+  ["ZAR","Oferta ZAR — Compra rápida",18.35,"buy","any","any"],["ZAR","Oferta ZAR — Melhor preço",18.20,"best_price","any","any"],["ZAR","Oferta ZAR — Arbitragem",18.10,"best_price","any","arbitrage"],["ZAR","Oferta ZAR — Comercial",18.30,"buy","any","commercial"],
+  ["USD","Oferta USD — Compra rápida",1.01,"buy","any","any"],["USD","Oferta USD — Melhor preço",1.00,"best_price","any","any"],["USD","Oferta USD — Arbitragem",0.99,"best_price","any","arbitrage"],["USD","Oferta USD — Comercial",1.01,"buy","any","commercial"]
+ ];
+ return base.map((x,i)=>({id:"OFF-DEFAULT-"+(i+1),title:x[1],label:"Oferta KOIN",countries:[x[0]],currency:x[0],price:x[2],unit:"per USDT",offerNeeds:[x[3]],firstTime:x[4],useCase:x[5],network:"",note:"Oferta padrão editável no painel KOIN.",priority:10,active:true,startAt:null,endAt:null,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}));
+}
+function ensure(){if(!fs.existsSync(dir))fs.mkdirSync(dir,{recursive:true});if(!fs.existsSync(file)){const d={...DEFAULTS,version:1,offers:seedDefaults()};fs.writeFileSync(file,JSON.stringify(d,null,2));}}
+function read(){ensure();try{const x=JSON.parse(fs.readFileSync(file,"utf8"))||{};return {...DEFAULTS,...x,offers:Array.isArray(x.offers)&&x.offers.length?x.offers:seedDefaults()}}catch{return {...DEFAULTS,offers:seedDefaults()}}}
+function write(d){ensure();const tmp=file+".tmp";fs.writeFileSync(tmp,JSON.stringify({...DEFAULTS,...d,version:Number(d.version||1)},null,2));fs.renameSync(tmp,file)}
 function get(){return read()}
 function clean(v,max=120){return String(v??"").trim().slice(0,max)}
 function normalize(input={}){
@@ -69,14 +79,14 @@ function add(input={}){
   createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()
  };
  if(!Number.isFinite(o.price)||o.price<=0)throw new Error("Offer price must be greater than zero.");
- d.offers=(d.offers||[]).concat(o).slice(-300);write(d);return o;
+ d.offers=(d.offers||[]).concat(o).slice(-300);d.version=Number(d.version||1)+1;write(d);return o;
 }
-function remove(id){const d=read();const old=d.offers||[];const item=old.find(x=>x.id===id);d.offers=old.filter(x=>x.id!==id);write(d);return item||null;}
-function updateOffer(id,input={}){const d=read();const idx=(d.offers||[]).findIndex(x=>x.id===id);if(idx<0)return null;const old=d.offers[idx];const next={...old,...input,updatedAt:new Date().toISOString()};if(input.price!==undefined){next.price=Number(input.price);if(!Number.isFinite(next.price)||next.price<=0)throw new Error("Offer price must be greater than zero.")}if(input.countries)next.countries=input.countries.map(x=>clean(x,8).toUpperCase()).filter(Boolean);if(input.offerNeeds)next.offerNeeds=input.offerNeeds.map(x=>clean(x,40)).filter(Boolean);if(input.startAt)next.startAt=new Date(input.startAt).toISOString();if(input.endAt)next.endAt=new Date(input.endAt).toISOString();d.offers[idx]=next;write(d);return next;}
+function remove(id){const d=read();const old=d.offers||[];const item=old.find(x=>x.id===id);d.offers=old.filter(x=>x.id!==id);d.version=Number(d.version||1)+1;write(d);return item||null;}
+function updateOffer(id,input={}){const d=read();const idx=(d.offers||[]).findIndex(x=>x.id===id);if(idx<0)return null;const old=d.offers[idx];const next={...old,...input,updatedAt:new Date().toISOString()};if(input.price!==undefined){next.price=Number(input.price);if(!Number.isFinite(next.price)||next.price<=0)throw new Error("Offer price must be greater than zero.")}if(input.countries)next.countries=input.countries.map(x=>clean(x,8).toUpperCase()).filter(Boolean);if(input.offerNeeds)next.offerNeeds=input.offerNeeds.map(x=>clean(x,40)).filter(Boolean);if(input.startAt)next.startAt=new Date(input.startAt).toISOString();if(input.endAt)next.endAt=new Date(input.endAt).toISOString();d.offers[idx]=next;d.version=Number(d.version||1)+1;write(d);return next;}
 function getOffer(id,answers={}){
  const d=read(); const o=(d.offers||[]).find(x=>x.id===id);
  if(!o||!isActive(o,Date.now())||!matches(o,normalize(answers)))return null;
  return publicOffer(o);
 }
-function settings(patch={}){const d=read();if(patch.enabled!==undefined)d.enabled=Boolean(patch.enabled);if(patch.rotateOnRefresh!==undefined)d.rotateOnRefresh=Boolean(patch.rotateOnRefresh);if(patch.requireOnboarding!==undefined)d.requireOnboarding=Boolean(patch.requireOnboarding);if(patch.supportUrl!==undefined)d.supportUrl=clean(patch.supportUrl,200)||"contact.html";write(d);return d;}
+function settings(patch={}){const d=read();if(patch.enabled!==undefined)d.enabled=Boolean(patch.enabled);if(patch.rotateOnRefresh!==undefined)d.rotateOnRefresh=Boolean(patch.rotateOnRefresh);if(patch.requireOnboarding!==undefined)d.requireOnboarding=Boolean(patch.requireOnboarding);if(patch.supportUrl!==undefined)d.supportUrl=clean(patch.supportUrl,200)||"contact.html";d.version=Number(d.version||1)+1;write(d);return d;}
 module.exports={file,get,settings,add,remove,updateOffer,recommend,listMatching,publicOffer,getOffer};

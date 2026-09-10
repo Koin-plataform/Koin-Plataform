@@ -6,7 +6,8 @@ const DEFAULTS={
  blockedCountries:[],requireCountrySelection:false,
  rates:{MZN:65,AOA:950,ZAR:18.5,USD:1.02},
  rateSchedules:[],
- announcements:[]
+ announcements:[],
+  supportUrl:"contact.html"
 };
 function ensure(){if(!fs.existsSync(dir))fs.mkdirSync(dir,{recursive:true});if(!fs.existsSync(file))fs.writeFileSync(file,JSON.stringify(DEFAULTS,null,2));}
 function read(){ensure();try{return {...DEFAULTS,...JSON.parse(fs.readFileSync(file,"utf8"))}}catch{return {...DEFAULTS}}}

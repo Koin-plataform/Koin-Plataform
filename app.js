@@ -22,12 +22,11 @@ const savedLanguage=localStorage.getItem("koinLanguage")||"en";if($("language"))
 // Live platform pricing: rates are controlled server-side by the operator.
 async function syncPlatformConfig(showChange=true){try{const r=await fetch("/api/config?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const d=await r.json();if(!d.success||!d.rates)return;const previous=localStorage.getItem("koinRateVersion");Object.keys(d.rates).forEach(k=>{if(CONFIG.currencies[k])CONFIG.currencies[k].price=Number(d.rates[k])});document.querySelectorAll(".rate-card").forEach(card=>{const strong=card.querySelector(".rate"),label=card.querySelector(".rate-label");if(!strong)return;const key=(card.querySelector(".coin strong")?.textContent||"").split("/")[1]?.trim();if(key&&CONFIG.currencies[key]){strong.textContent=Number(CONFIG.currencies[key].price).toFixed(2);if(label)label.textContent=key+" per USDT"}});if(!selectedOffer)update();if(showChange&&previous&&d.rateVersion&&previous!==d.rateVersion)showPriceToast("Price update","KOIN rates are now updated.");if(d.rateVersion)localStorage.setItem("koinRateVersion",d.rateVersion);if(d.nextRateSchedule)localStorage.setItem("koinNextRateSchedule",JSON.stringify(d.nextRateSchedule));else localStorage.removeItem("koinNextRateSchedule")}catch{}}
 function showPriceToast(title,text){let box=$("priceToast");if(!box){box=document.createElement("div");box.id="priceToast";box.className="platform-notice price-toast";document.body.appendChild(box)}box.innerHTML='<div class="platform-notice-icon">↻</div><div class="platform-notice-content"><strong>'+escapeHtml(title)+'</strong><p>'+escapeHtml(text)+'</p></div><button class="platform-notice-ok" aria-label="OK">OK</button>';box.classList.add("show");const ok=box.querySelector("button");if(ok)ok.onclick=()=>box.classList.remove("show");clearTimeout(window.__koinPriceToastTimer);window.__koinPriceToastTimer=setTimeout(()=>box.classList.remove("show"),5000)}
-function showPlatformNotice(title,text,announcementId=null){
- let box=$('platformNotice'); if(!box){box=document.createElement('div');box.id='platformNotice';box.className='platform-notice';document.body.appendChild(box);}
- box.innerHTML='<div class="platform-notice-icon">!</div><div class="platform-notice-content"><strong>'+escapeHtml(title)+'</strong><p>'+escapeHtml(text)+'</p></div><button class="platform-notice-ok" aria-label="OK">OK</button>';
- box.classList.add('show');
- const ok=box.querySelector('.platform-notice-ok');
- if(ok) ok.onclick=()=>{box.classList.remove('show');if(announcementId)localStorage.setItem('koinNoticeLast_'+announcementId,String(Date.now()));};
+function showPlatformNotice(title,text,announcementId=null,supportUrl="contact.html"){
+ let box=$("announcementModal");
+ if(!box){box=document.createElement("div");box.id="announcementModal";box.className="announcement-modal";box.innerHTML='<div class="announcement-backdrop"></div><div class="announcement-card"><div class="announcement-kicker">KOIN</div><div class="announcement-icon">!</div><h3 id="announcementTitle"></h3><p id="announcementText"></p><div class="announcement-actions"><a id="announcementMore" class="secondary-button" target="_self">Saber mais</a><button id="announcementOk" class="primary-button">OK, continuar <span>→</span></button></div></div>';document.body.appendChild(box);}
+ $("announcementTitle").textContent=title;$("announcementText").textContent=text;$("announcementMore").href=supportUrl||"contact.html";box.classList.add("show");box.setAttribute("aria-hidden","false");
+ const close=()=>{box.classList.remove("show");box.setAttribute("aria-hidden","true")};$("announcementOk").onclick=close;$("announcementMore").onclick=close;$("announcementModal").querySelector(".announcement-backdrop").onclick=close;
 }
 async function syncAnnouncements(){
  try{
@@ -36,12 +35,12 @@ async function syncAnnouncements(){
   const active=(d.announcements||[]).filter(x=>x.id&&Date.parse(x.startAt||x.at||0)<=now&&Date.parse(x.endAt||'2999-01-01')>=now);
   for(const a of active){
    if(a.kind==='instant'){
-    if(!localStorage.getItem('koinInstantNotice_'+a.id)){showPlatformNotice('KOIN notice',a.text,a.id);localStorage.setItem('koinInstantNotice_'+a.id,'1');break;}
+    if(!localStorage.getItem('koinInstantNotice_'+a.id)){showPlatformNotice('Aviso KOIN',a.text,a.id,a.supportUrl||'contact.html');localStorage.setItem('koinInstantNotice_'+a.id,'1');break;}
     continue;
    }
    const repeat=Math.max(1,Number(a.repeatEveryMinutes)||60)*60000;
    const last=Number(localStorage.getItem('koinNoticeLast_'+a.id)||0);
-   if(now-last>=repeat){showPlatformNotice('KOIN notice',a.text,a.id);localStorage.setItem('koinNoticeLast_'+a.id,String(now));break;}
+   if(now-last>=repeat){showPlatformNotice('Aviso KOIN',a.text,a.id,a.supportUrl||'contact.html');localStorage.setItem('koinNoticeLast_'+a.id,String(now));break;}
   }
  }catch{}
 }
@@ -73,7 +72,7 @@ async function syncAnnouncements(){
 })();
 
 
-syncPlatformConfig(false); syncAnnouncements(); setInterval(()=>syncPlatformConfig(true),2000); setInterval(syncAnnouncements,30000);
+syncPlatformConfig(false); syncAnnouncements(); syncOfferConfig(); setInterval(()=>syncPlatformConfig(true),2000); setInterval(syncAnnouncements,5000); setInterval(syncOfferConfig,2000);
 
 // Personalized onboarding + offer engine.
 (function initWelcome(){
@@ -96,5 +95,7 @@ function scrollToOffer(){const sec=$("recommendedOffer");if(sec&&!sec.hidden)set
 function applyOffer(o){selectedOffer=o||null;if(selectedOffer){country.value=selectedOffer.currency;if($("checkoutCountry"))$("checkoutCountry").value=selectedOffer.currency;if($("checkoutCurrencyHome"))$("checkoutCurrencyHome").value=selectedOffer.currency;window.scrollTo({top:Math.max(0,$("buy")?.getBoundingClientRect().top+window.scrollY-90),behavior:"smooth"});}update();show("Oferta aplicada ao checkout.")}
 function renderRecommendedOffers(list,data){const sec=$("recommendedOffer"),card=$("recommendedOfferCard"),profile=$("offerProfile");if(!sec||!card)return;profile.innerHTML='<span>'+escapeHtml(data.name||'Visitante')+'</span><span>'+escapeHtml(data.country||'')+'</span><span>'+escapeHtml(data.offerNeed||'')+'</span>';const o=list[0];if(!o){card.innerHTML='<div class="recommended-offer"><div class="offer-topline"><span>KOIN</span><span>'+escapeHtml(data.country||'')+'</span></div><h3>Ainda não há uma oferta compatível.</h3><p>Não encontrámos uma oferta KOIN para este perfil agora. Podes consultar a Community para explorar outras opções.</p><a href="p2p.html" class="primary-button">Abrir Community <span>→</span></a></div>';sec.hidden=false;scrollToOffer();return}card.innerHTML='<div class="recommended-offer"><div class="offer-topline"><span>'+escapeHtml(o.label||'Oferta KOIN')+'</span><span>'+escapeHtml(o.country||'')+'</span></div><h3>'+escapeHtml(o.title)+'</h3><div class="offer-price"><strong>'+Number(o.price).toFixed(4)+'</strong><span>'+escapeHtml(o.currency)+' / USDT</span></div>'+(o.network?'<div class="offer-meta">Rede recomendada: '+escapeHtml(o.network)+'</div>':'')+(o.note?'<p>'+escapeHtml(o.note)+'</p>':'')+'<button type="button" class="primary-button use-offer" data-offer-id="'+escapeHtml(o.id)+'">Usar esta oferta <span>→</span></button></div>';sec.hidden=false;const b=card.querySelector('.use-offer');if(b)b.onclick=()=>applyOffer(o);scrollToOffer()}
 (function initOfferRotation(){const saved=localStorage.getItem('koinWelcome');if(!saved)return;let data;try{data=JSON.parse(saved)}catch{return}if(!data.completed)return;let seed=Number(localStorage.getItem('koinOfferRefreshSeed')||0);seed++;localStorage.setItem('koinOfferRefreshSeed',String(seed));loadRecommendedOffer(data)})();
-setInterval(()=>{if(selectedOffer)return;const raw=localStorage.getItem("koinWelcome");if(!raw)return;try{const d=JSON.parse(raw);if(d.completed)loadRecommendedOffer(d)}catch{}},3000);
+let __koinOfferVersion=Number(localStorage.getItem("koinOfferVersion")||0);
+async function syncOfferConfig(){try{const r=await fetch("/api/offers/config?t="+Date.now(),{cache:"no-store"}); if(r.status===401||r.status===403)return; const d=await r.json(); const v=Number(d.settings?.version||0); if(v&&__koinOfferVersion&&v!==__koinOfferVersion){const raw=localStorage.getItem("koinWelcome");if(raw){const data=JSON.parse(raw);if(data.completed){localStorage.setItem("koinOfferRefreshSeed",String(Number(localStorage.getItem("koinOfferRefreshSeed")||0)+1));loadRecommendedOffer(data);}}} if(v){__koinOfferVersion=v;localStorage.setItem("koinOfferVersion",String(v));}}catch{}}
+
 // Existing live platform pricing / notices.

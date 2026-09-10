@@ -23,11 +23,19 @@ app.get("/api/community/offers",(req,res)=>{res.set("Cache-Control","no-store, n
 app.post("/api/community/offers",(req,res)=>{try{const offer=community.addOffer(req.body||{});res.json({success:true,offer});}catch(e){res.status(400).json({success:false,message:e.message||"Invalid offer."});}});
 app.delete("/api/community/offers/:id",adminAuth,(req,res)=>{const offer=community.removeOffer(req.params.id);if(!offer)return res.status(404).json({success:false,message:"Offer not found."});res.json({success:true});});
 app.get("/api/config",(req,res)=>{res.set("Cache-Control","no-store, no-cache, must-revalidate, proxy-revalidate");res.json({success:true,rates:limits.currentRates(),rateVersion:limits.rateVersion(),nextRateSchedule:limits.nextSchedule(),updatedAt:new Date().toISOString()})});
+app.get("/api/offers/config",(req,res)=>{const s=offers.get();res.set("Cache-Control","no-store");res.json({success:true,enabled:s.enabled,rotateOnRefresh:s.rotateOnRefresh,version:s.version||1});});
 app.get("/api/offers/recommend",(req,res)=>{res.set("Cache-Control","no-store, no-cache, must-revalidate, proxy-revalidate");const answers={country:String(req.query.country||""),offerNeed:String(req.query.offerNeed||""),firstTime:String(req.query.firstTime||""),useCase:String(req.query.useCase||"")};const seed=Math.max(0,Number(req.query.seed)||0);res.json({success:true,enabled:offers.get().enabled,rotateOnRefresh:offers.get().rotateOnRefresh,offers:offers.recommend(answers,seed)})});
 app.post("/api/onboarding",(req,res)=>{try{const visitor=onboarding.save(req.body||{});const cfg=offers.get();res.json({success:true,visitor,offersEnabled:Boolean(cfg.enabled),offers:offers.recommend(req.body||{},0)})}catch(e){res.status(400).json({success:false,message:e.message||"Invalid onboarding."})}});
-app.get("/api/admin/offers",adminAuth,(req,res)=>{const s=offers.get();res.json({success:true,settings:{enabled:s.enabled,rotateOnRefresh:s.rotateOnRefresh,requireOnboarding:s.requireOnboarding,supportUrl:s.supportUrl},offers:(s.offers||[]).slice().reverse()})});
+app.get("/api/admin/offers",adminAuth,(req,res)=>{const s=offers.get();res.json({success:true,settings:{enabled:s.enabled,rotateOnRefresh:s.rotateOnRefresh,requireOnboarding:s.requireOnboarding,supportUrl:s.supportUrl,version:s.version||1},offers:(s.offers||[]).slice().reverse()})});
 app.put("/api/admin/offers/settings",adminAuth,(req,res)=>res.json({success:true,settings:offers.settings(req.body||{})}));
-app.post("/api/admin/offers",adminAuth,(req,res)=>{try{res.json({success:true,offer:offers.add(req.body||{})})}catch(e){res.status(400).json({success:false,message:e.message||"Invalid offer."})}});
+app.post("/api/admin/offers",adminAuth,(req,res)=>{try{
+ const body=req.body||{}, offer=offers.add(body); let announcement=null;
+ if(body.announceOnStart && offer.startAt){
+   const start=new Date(offer.startAt);
+   if(start>new Date()){announcement=limits.addAnnouncement(body.announcementText||`${offer.title} is now available at ${offer.price} ${offer.currency} / USDT.`,{kind:"scheduled",startAt:start.toISOString(),endAt:new Date(start.getTime()+3650*24*60*60*1000).toISOString(),repeatEveryMinutes:0,supportUrl:offers.get().supportUrl});}
+ }
+ res.json({success:true,offer,announcement});
+}catch(e){res.status(400).json({success:false,message:e.message||"Invalid offer."})}});
 app.put("/api/admin/offers/:id",adminAuth,(req,res)=>{try{const item=offers.updateOffer(req.params.id,req.body||{});if(!item)return res.status(404).json({success:false,message:"Offer not found."});res.json({success:true,offer:item})}catch(e){res.status(400).json({success:false,message:e.message||"Invalid offer."})}});
 app.delete("/api/admin/offers/:id",adminAuth,(req,res)=>{const item=offers.remove(req.params.id);if(!item)return res.status(404).json({success:false,message:"Offer not found."});res.json({success:true})});
 app.get("/api/admin/onboarding",adminAuth,(req,res)=>res.json({success:true,visitors:onboarding.list()}));
@@ -39,7 +47,7 @@ app.post("/api/admin/rate-schedules",adminAuth,(req,res)=>{try{
  let announcement=null;
  if(String(body.announcement||"").trim()){
    const start=new Date(item.effectiveAt); const end=new Date(start.getTime()+Number(item.popupDurationMinutes||1440)*60000);
-   announcement=limits.addAnnouncement(String(body.announcement).trim(),{startAt:start.toISOString(),endAt:end.toISOString(),repeatEveryMinutes:Number(body.popupRepeatMinutes||60)});
+   announcement=limits.addAnnouncement(String(body.announcement).trim(),{kind:"scheduled",startAt:start.toISOString(),endAt:new Date(start.getTime()+3650*24*60*60*1000).toISOString(),repeatEveryMinutes:0,supportUrl:limits.get().supportUrl||"contact.html"});
  }
  res.json({success:true,schedule:item,announcement});
 }catch(e){res.status(400).json({success:false,message:e.message||"Invalid schedule."})}});
