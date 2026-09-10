@@ -16,4 +16,5 @@ async function addPaymentMethod(accountId,body){const type=String(body.type||"")
 async function removePaymentMethod(accountId,methodId){const all=read(),a=all.find(x=>x.id===accountId);if(!a)return false;const before=(a.paymentMethods||[]).length;a.paymentMethods=(a.paymentMethods||[]).filter(m=>m.id!==methodId);if(a.paymentMethods.length===before)return false;write(all);return true}
 function adminList(){return read().map(safe)}
 function setStatus(accountId,status){const all=read(),a=all.find(x=>x.id===accountId);if(!a)return null;status=String(status||"").toUpperCase();if(!["ACTIVE","DISABLED"].includes(status))throw Error("Invalid account status.");a.status=status;write(all);if(status==="DISABLED")for(const [t,s] of sessions)if(s.accountId===accountId)sessions.delete(t);return safe(a)}
-module.exports={register,authenticate,createToken,fromToken,addPaymentMethod,removePaymentMethod,adminList,setStatus};
+function tokenFromRequest(req){const auth=String(req.headers.authorization||"").replace(/^Bearer\s+/i,"").trim();if(auth)return auth;const raw=String(req.headers.cookie||"");const m=raw.match(/(?:^|;\s*)koin_account_session=([^;]+)/);return m?decodeURIComponent(m[1]):""}
+module.exports={register,authenticate,createToken,fromToken,tokenFromRequest,addPaymentMethod,removePaymentMethod,adminList,setStatus};

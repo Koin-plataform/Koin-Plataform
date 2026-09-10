@@ -9,7 +9,7 @@ const db=require("./database");
 const limits=require("./limits");
 const customers=require("./customers");const offers=require("./offers");const accounts=require("./accounts");
 const router=express.Router();
-async function accountFromRequest(req){return accounts.fromToken(String(req.headers.authorization||"").replace(/^Bearer\s+/i,""));}
+async function accountFromRequest(req){return accounts.fromToken(accounts.tokenFromRequest(req));}
 router.use(async(req,res,next)=>{const a=await accountFromRequest(req);if(!a)return res.status(401).json({success:false,message:"Please sign in to your KOIN account before accessing orders."});req.koinAccount=a;next();});
 const createAttempts=new Map();
 function allowCreate(ip){const now=Date.now(),x=createAttempts.get(ip)||{n:0,t:now};if(now-x.t>15*60*1000){x.n=0;x.t=now}x.n++;createAttempts.set(ip,x);return x.n<=25}

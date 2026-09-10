@@ -1,0 +1,12 @@
+[
+  {
+    "id": "KAC-DBD1E94DB4F2",
+    "name": "Test User",
+    "email": "test@example.com",
+    "passwordHash": "d2566bcc15b15697e3e6beaa0bbe90111dc9ff426bc9e1779cd0aff95a914d57630383faf64e7b221156bbb439607b134b16ed3b756863ed8adc179418d2dd45",
+    "passwordSalt": "8ed63f13a4ee229c6c3145afd512768f",
+    "createdAt": "2026-09-10T15:35:49.820Z",
+    "status": "ACTIVE",
+    "paymentMethods": []
+  }
+]
