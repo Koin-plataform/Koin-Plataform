@@ -42,7 +42,7 @@ function addAnnouncement(text,input={}){
  const startAt=input.startAt?new Date(input.startAt).toISOString():now.toISOString();
  const endAt=input.endAt?new Date(input.endAt).toISOString():new Date(now.getTime()+24*60*60*1000).toISOString();
  const repeatEveryMinutes=Math.max(1,Math.min(10080,Number(input.repeatEveryMinutes)||60));
- const item={id:require("crypto").randomUUID(),text:String(text||"").trim().slice(0,300),startAt,endAt,repeatEveryMinutes,createdAt:now.toISOString()};
+ const item={id:require("crypto").randomUUID(),kind:input.kind==='instant'?'instant':'scheduled',text:String(text||"").trim().slice(0,300),startAt,endAt,repeatEveryMinutes:input.kind==='instant'?0:repeatEveryMinutes,createdAt:now.toISOString()};
  if(!item.text)throw new Error("Announcement text is required.");
  if(Date.parse(endAt)<=Date.parse(startAt))throw new Error("End time must be after start time.");
  d.announcements=(d.announcements||[]).concat(item).slice(-200);write(d);return item;

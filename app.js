@@ -53,6 +53,10 @@ async function syncAnnouncements(){
   const now=Date.now();
   const active=(d.announcements||[]).filter(x=>x.id&&Date.parse(x.startAt||x.at||0)<=now&&Date.parse(x.endAt||'2999-01-01')>=now);
   for(const a of active){
+   if(a.kind==='instant'){
+    if(!localStorage.getItem('koinInstantNotice_'+a.id)){showPlatformNotice('KOIN notice',a.text,a.id);localStorage.setItem('koinInstantNotice_'+a.id,'1');break;}
+    continue;
+   }
    const repeat=Math.max(1,Number(a.repeatEveryMinutes)||60)*60000;
    const last=Number(localStorage.getItem('koinNoticeLast_'+a.id)||0);
    if(now-last>=repeat){showPlatformNotice('KOIN notice',a.text,a.id);localStorage.setItem('koinNoticeLast_'+a.id,String(now));break;}
