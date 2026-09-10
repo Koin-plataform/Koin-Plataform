@@ -14,15 +14,15 @@ const DEFAULTS={
 };
 function seedDefaults(){
  const base=[
-  ["MZN","Oferta MZN — Compra rápida",64.90,"buy","any","any"],["MZN","Oferta MZN — Melhor preço",64.50,"best_price","any","any"],["MZN","Oferta MZN — Arbitragem",64.20,"best_price","any","arbitrage"],["MZN","Oferta MZN — Comercial",64.70,"buy","any","commercial"],
-  ["AOA","Oferta AOA — Compra rápida",945,"buy","any","any"],["AOA","Oferta AOA — Melhor preço",940,"best_price","any","any"],["AOA","Oferta AOA — Arbitragem",935,"best_price","any","arbitrage"],["AOA","Oferta AOA — Comercial",942,"buy","any","commercial"],
-  ["ZAR","Oferta ZAR — Compra rápida",18.35,"buy","any","any"],["ZAR","Oferta ZAR — Melhor preço",18.20,"best_price","any","any"],["ZAR","Oferta ZAR — Arbitragem",18.10,"best_price","any","arbitrage"],["ZAR","Oferta ZAR — Comercial",18.30,"buy","any","commercial"],
-  ["USD","Oferta USD — Compra rápida",1.01,"buy","any","any"],["USD","Oferta USD — Melhor preço",1.00,"best_price","any","any"],["USD","Oferta USD — Arbitragem",0.99,"best_price","any","arbitrage"],["USD","Oferta USD — Comercial",1.01,"buy","any","commercial"]
+  ["MZN","Oferta MZN — Compra rápida",66,"buy","any","any"],["MZN","Oferta MZN — Melhor preço",67,"best_price","any","any"],["MZN","Oferta MZN — Arbitragem",68,"best_price","any","arbitrage"],["MZN","Oferta MZN — Comercial",69,"buy","any","commercial"],
+  ["AOA","Oferta AOA — Compra rápida",955,"buy","any","any"],["AOA","Oferta AOA — Melhor preço",960,"best_price","any","any"],["AOA","Oferta AOA — Arbitragem",965,"best_price","any","arbitrage"],["AOA","Oferta AOA — Comercial",970,"buy","any","commercial"],
+  ["ZAR","Oferta ZAR — Compra rápida",19,"buy","any","any"],["ZAR","Oferta ZAR — Melhor preço",20,"best_price","any","any"],["ZAR","Oferta ZAR — Arbitragem",21,"best_price","any","arbitrage"],["ZAR","Oferta ZAR — Comercial",19,"buy","any","commercial"],
+  ["USD","Oferta USD — Compra rápida",1.03,"buy","any","any"],["USD","Oferta USD — Melhor preço",1.04,"best_price","any","any"],["USD","Oferta USD — Arbitragem",1.05,"best_price","any","arbitrage"],["USD","Oferta USD — Comercial",1.03,"buy","any","commercial"]
  ];
  return base.map((x,i)=>({id:"OFF-DEFAULT-"+(i+1),title:x[1],label:"Oferta KOIN",countries:[x[0]],currency:x[0],price:x[2],unit:"per USDT",offerNeeds:[x[3]],firstTime:x[4],useCase:x[5],network:"",note:"Oferta padrão editável no painel KOIN.",priority:10,active:true,startAt:null,endAt:null,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}));
 }
 function ensure(){if(!fs.existsSync(dir))fs.mkdirSync(dir,{recursive:true});if(!fs.existsSync(file)){const d={...DEFAULTS,version:1,offers:seedDefaults()};fs.writeFileSync(file,JSON.stringify(d,null,2));}}
-function read(){ensure();try{const x=JSON.parse(fs.readFileSync(file,"utf8"))||{};return {...DEFAULTS,...x,offers:Array.isArray(x.offers)&&x.offers.length?x.offers:seedDefaults()}}catch{return {...DEFAULTS,offers:seedDefaults()}}}
+function read(){ensure();try{const x=JSON.parse(fs.readFileSync(file,"utf8"))||{};const d={...DEFAULTS,...x,offers:Array.isArray(x.offers)&&x.offers.length?x.offers:seedDefaults()};return migrateDefaults(d)}catch{return {...DEFAULTS,offers:seedDefaults()}}}
 function write(d){ensure();const tmp=file+".tmp";fs.writeFileSync(tmp,JSON.stringify({...DEFAULTS,...d,version:Number(d.version||1)},null,2));fs.renameSync(tmp,file)}
 function get(){return read()}
 function clean(v,max=120){return String(v??"").trim().slice(0,max)}
@@ -57,6 +57,19 @@ function recommend(answers={},seed=0){
  if(!d.rotateOnRefresh)return list.slice(0,3);
  const n=Math.max(0,Number(seed)||0);const shift=n%list.length;const rotated=list.slice(shift).concat(list.slice(0,shift));return rotated.slice(0,3);
 }
+const PRICE_RULES={MZN:{min:65,max:70,step:1},AOA:{min:950,max:1000,step:1},ZAR:{min:18.5,max:22,step:1},USD:{min:1.02,max:1.1,step:0.01}};
+function validatePrice(currency,price){const c=String(currency||"MZN").toUpperCase();const r=PRICE_RULES[c];if(!r)return;const n=Number(price);if(!Number.isFinite(n)||n<=r.min||n>=r.max)throw new Error(`Preço ${c} deve ser maior que ${r.min} e menor que ${r.max}.`);const scaled=Math.round((n/r.step))*r.step;if(Math.abs(n-scaled)>1e-9)throw new Error(`Preço ${c} deve usar valores redondos.`);}
+function migrateDefaults(d){
+ let changed=false;
+ const defaults=seedDefaults();
+ const existing=new Map((d.offers||[]).map(o=>[o.id,o]));
+ for(const def of defaults){
+   if(!existing.has(def.id)){ d.offers=(d.offers||[]).concat(def); changed=true; }
+ }
+ if(changed){ d.version=Number(d.version||1)+1; write(d); }
+ return d;
+}
+
 function add(input={}){
  const d=read();
  const o={
@@ -78,11 +91,12 @@ function add(input={}){
   endAt:input.endAt?new Date(input.endAt).toISOString():null,
   createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()
  };
- if(!Number.isFinite(o.price)||o.price<=0)throw new Error("Offer price must be greater than zero.");
+ validatePrice(o.currency,o.price);
  d.offers=(d.offers||[]).concat(o).slice(-300);d.version=Number(d.version||1)+1;write(d);return o;
 }
 function remove(id){const d=read();const old=d.offers||[];const item=old.find(x=>x.id===id);d.offers=old.filter(x=>x.id!==id);d.version=Number(d.version||1)+1;write(d);return item||null;}
-function updateOffer(id,input={}){const d=read();const idx=(d.offers||[]).findIndex(x=>x.id===id);if(idx<0)return null;const old=d.offers[idx];const next={...old,...input,updatedAt:new Date().toISOString()};if(input.price!==undefined){next.price=Number(input.price);if(!Number.isFinite(next.price)||next.price<=0)throw new Error("Offer price must be greater than zero.")}if(input.countries)next.countries=input.countries.map(x=>clean(x,8).toUpperCase()).filter(Boolean);if(input.offerNeeds)next.offerNeeds=input.offerNeeds.map(x=>clean(x,40)).filter(Boolean);if(input.startAt)next.startAt=new Date(input.startAt).toISOString();if(input.endAt)next.endAt=new Date(input.endAt).toISOString();d.offers[idx]=next;d.version=Number(d.version||1)+1;write(d);return next;}
+function updateOffer(id,input={}){const d=read();const idx=(d.offers||[]).findIndex(x=>x.id===id);if(idx<0)return null;const old=d.offers[idx];const next={...old,...input,updatedAt:new Date().toISOString()};if(input.price!==undefined){next.price=Number(input.price);validatePrice(next.currency,next.price)}
+if(input.currency!==undefined){next.currency=clean(input.currency,8).toUpperCase();validatePrice(next.currency,next.price)}if(input.countries)next.countries=input.countries.map(x=>clean(x,8).toUpperCase()).filter(Boolean);if(input.offerNeeds)next.offerNeeds=input.offerNeeds.map(x=>clean(x,40)).filter(Boolean);if(input.startAt)next.startAt=new Date(input.startAt).toISOString();if(input.endAt)next.endAt=new Date(input.endAt).toISOString();d.offers[idx]=next;d.version=Number(d.version||1)+1;write(d);return next;}
 function getOffer(id,answers={}){
  const d=read(); const o=(d.offers||[]).find(x=>x.id===id);
  if(!o||!isActive(o,Date.now())||!matches(o,normalize(answers)))return null;
