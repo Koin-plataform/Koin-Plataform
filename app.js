@@ -76,4 +76,21 @@ function renderRecommendedOffers(list,data){const sec=$("recommendedOffer"),card
 let __koinOfferVersion=Number(localStorage.getItem("koinOfferVersion")||0);
 async function syncOfferConfig(){try{const r=await fetch("/api/offers/config?t="+Date.now(),{cache:"no-store"}); if(r.status===401||r.status===403)return; const d=await r.json(); const v=Number(d.settings?.version||0); if(v&&__koinOfferVersion&&v!==__koinOfferVersion){const raw=localStorage.getItem("koinWelcome");if(raw){const data=JSON.parse(raw);if(data.completed){localStorage.setItem("koinOfferRefreshSeed",String(Number(localStorage.getItem("koinOfferRefreshSeed")||0)+1));loadRecommendedOffer(data);}}} if(v){__koinOfferVersion=v;localStorage.setItem("koinOfferVersion",String(v));}}catch{}}
 
+
+// Cookie consent — persistent across reloads.
+(function initCookieConsent(){
+  const banner=document.getElementById('cookieBanner');
+  const accept=document.getElementById('acceptCookies');
+  const reject=document.getElementById('rejectCookies');
+  if(!banner)return;
+  const KEY='koinCookieConsent';
+  const hide=()=>{banner.classList.add('hidden');banner.setAttribute('aria-hidden','true');};
+  const save=(value)=>{try{localStorage.setItem(KEY,value)}catch{};hide();};
+  let saved='';
+  try{saved=localStorage.getItem(KEY)||''}catch{}
+  if(saved==='accepted'||saved==='rejected')hide();
+  accept?.addEventListener('click',()=>save('accepted'));
+  reject?.addEventListener('click',()=>save('rejected'));
+})();
+
 // Existing live platform pricing / notices.

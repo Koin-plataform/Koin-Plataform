@@ -1391,6 +1391,8 @@ footer {
    COOKIE
 ========================= */
 
+.cookie-banner.hidden { display:none !important; }
+
 .cookie-banner {
   position: fixed;
 
