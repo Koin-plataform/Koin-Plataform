@@ -93,13 +93,25 @@ async function syncAnnouncements(){
 
 syncPlatformConfig(false); syncAnnouncements(); setInterval(()=>{syncPlatformConfig(true);syncAnnouncements()},30000);
 
-// Lightweight onboarding: answers are stored locally and can affect the selected market / guidance.
+// Personalized onboarding + offer engine. Answers are submitted to the server only after completion.
 (function initWelcome(){
- const overlay=$("welcomeOverlay"), dots=$("welcomeDots"), skip=$("welcomeSkip"); if(!overlay)return;
+ const overlay=$("welcomeOverlay"), notice=$("welcomeNotice"), quiz=$("welcomeQuiz"), cont=$("welcomeContinue"), nameInput=$("welcomeName"), dots=$("welcomeDots");
+ if(!overlay)return;
  let data={}; try{data=JSON.parse(localStorage.getItem("koinWelcome")||"{}")}catch{}
- if(data.completed){overlay.remove();return;}
- overlay.classList.add("show"); overlay.setAttribute("aria-hidden","false"); let step=1;
- const render=()=>{document.querySelectorAll(".welcome-step").forEach(x=>x.hidden=Number(x.dataset.step)!==step); if(dots)dots.textContent=step===1?"● ○ ○":step===2?"○ ● ○":"○ ○ ●"};
- document.querySelectorAll(".welcome-options button").forEach(btn=>btn.addEventListener("click",()=>{data[btn.dataset.answer]=btn.dataset.value;if(btn.dataset.answer==="market"&&country){country.value=btn.dataset.value;update();} if(step<3){step++;render();}else{data.completed=true;data.completedAt=new Date().toISOString();localStorage.setItem("koinWelcome",JSON.stringify(data));overlay.classList.remove("show");overlay.setAttribute("aria-hidden","true");setTimeout(()=>overlay.remove(),220);}}));
- skip?.addEventListener("click",()=>{data.completed=true;data.skipped=true;localStorage.setItem("koinWelcome",JSON.stringify(data));overlay.remove();}); render();
+ const render=(step)=>{document.querySelectorAll(".welcome-step").forEach(x=>x.hidden=Number(x.dataset.step)!==step);if(dots)dots.textContent=[1,2,3,4,5].map(n=>n===step?"●":"○").join(" ")};
+ function finish(){data.name=(nameInput?.value||data.name||"").trim();if(!data.name)return show("Introduza o seu nome.");data.completed=true;data.completedAt=new Date().toISOString();localStorage.setItem("koinWelcome",JSON.stringify(data));overlay.classList.remove("show");overlay.setAttribute("aria-hidden","true");setTimeout(()=>overlay.remove(),220);submitOnboarding(data);}
+ function startQuiz(){notice.hidden=true;quiz.hidden=false;render(1);setTimeout(()=>nameInput?.focus(),80);}
+ cont?.addEventListener("click",startQuiz);
+ document.querySelectorAll(".welcome-options button").forEach(btn=>btn.addEventListener("click",()=>{data[btn.dataset.answer]=btn.dataset.value;if(btn.dataset.answer==='country'&&country){country.value=btn.dataset.value;update()}const step=Number(btn.closest('.welcome-step')?.dataset.step||1);if(step<5)render(step+1);else finish();}));
+ document.querySelectorAll(".welcome-next").forEach(btn=>btn.addEventListener("click",()=>{data.name=(nameInput?.value||"").trim();if(!data.name)return show("Introduza o seu nome.");render(2);}));
+ nameInput?.addEventListener("keydown",e=>{if(e.key==='Enter'){e.preventDefault();document.querySelector('.welcome-next')?.click()}});
+
+ const saved=data.completed?data:null; if(saved){overlay.remove();loadRecommendedOffer(saved);return;}
+ overlay.classList.add("show");overlay.setAttribute("aria-hidden","false");
 })();
+async function submitOnboarding(data){try{const r=await fetch('/api/onboarding',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});const d=await r.json();if(r.ok&&d.success)renderRecommendedOffers(d.offers||[],data);}catch{loadRecommendedOffer(data)}}
+async function loadRecommendedOffer(data){try{const seed=Number(localStorage.getItem('koinOfferRefreshSeed')||0);const r=await fetch('/api/offers/recommend?country='+encodeURIComponent(data.country||country?.value||'MZN')+'&offerNeed='+encodeURIComponent(data.offerNeed||'')+'&firstTime='+encodeURIComponent(data.firstTime||'')+'&useCase='+encodeURIComponent(data.useCase||'')+'&seed='+seed,{cache:'no-store'});const d=await r.json();if(d.success)renderRecommendedOffers(d.offers||[],data);}catch{}}
+function renderRecommendedOffers(list,data){const sec=$('recommendedOffer'),card=$('recommendedOfferCard'),profile=$('offerProfile');if(!sec||!card)return;profile.innerHTML='<span>'+escapeHtml(data.name||'Visitante')+'</span><span>'+escapeHtml(data.country||'')+'</span><span>'+escapeHtml(data.offerNeed||'')+'</span>';if(!list.length){card.innerHTML=`<div class="recommended-offer"><div class="offer-topline"><span>KOIN</span><span>${escapeHtml(data.country||'')}</span></div><h3>Ainda não há uma oferta compatível.</h3><p>As ofertas são definidas e atualizadas pela KOIN. Se procuras outra forma de pagamento ou queres negociar com alguém, podes consultar a Community.</p><a href="p2p.html" class="primary-button">Abrir Community <span>→</span></a></div>`;sec.hidden=false;return;}card.innerHTML=list.map((o,i)=>`<div class="recommended-offer ${i?'offer-alt':''}"><div class="offer-topline"><span>${escapeHtml(o.label||'Oferta KOIN')}</span><span>${escapeHtml(o.country||'')}</span></div><h3>${escapeHtml(o.title)}</h3><div class="offer-price"><strong>${Number(o.price).toFixed(4)}</strong><span>${escapeHtml(o.currency)} / USDT</span></div>${o.network?`<div class="offer-meta">Rede: ${escapeHtml(o.network)}</div>`:''}${o.note?`<p>${escapeHtml(o.note)}</p>`:''}<a href="#buy" class="primary-button">Usar esta oferta <span>→</span></a></div>`).join('');sec.hidden=false;}
+(function initOfferRotation(){const saved=localStorage.getItem('koinWelcome');if(!saved)return;let data;try{data=JSON.parse(saved)}catch{return}if(!data.completed||data.skipped)return;let seed=Number(localStorage.getItem('koinOfferRefreshSeed')||0);seed++;localStorage.setItem('koinOfferRefreshSeed',String(seed));loadRecommendedOffer(data);})();
+
+// Existing live platform pricing / notices.

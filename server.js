@@ -4,7 +4,7 @@ const express=require("express");const path=require("path");const fs=require("fs
 const db=require("./database");
 const community=require("./community");
 const customers=require("./customers");
-const limits=require("./limits");const {router:ordersRouter,publicOrder,sendEmail,emailLayout,notify,orderDetailsHtml,recordEmail}=require("./orders");
+const limits=require("./limits");const offers=require("./offers");const onboarding=require("./onboarding");const {router:ordersRouter,publicOrder,sendEmail,emailLayout,notify,orderDetailsHtml,recordEmail}=require("./orders");
 const app=express();const PORT=Number(process.env.PORT||3000);
 app.disable("x-powered-by");app.set("trust proxy",1);app.use(express.json({limit:"100kb"}));app.use(express.urlencoded({extended:true}));
 const ADMIN_USER=process.env.ADMIN_USERNAME||"Jay";const ADMIN_PASS=process.env.ADMIN_PASSWORD||"";const ADMIN_HASH=process.env.ADMIN_PASSWORD_HASH||"";const SESSION_SECRET=process.env.ADMIN_SESSION_SECRET||"";const COOKIE="koin_admin_session";const attempts=new Map();
@@ -23,6 +23,14 @@ app.get("/api/community/offers",(req,res)=>{res.set("Cache-Control","no-store, n
 app.post("/api/community/offers",(req,res)=>{try{const offer=community.addOffer(req.body||{});res.json({success:true,offer});}catch(e){res.status(400).json({success:false,message:e.message||"Invalid offer."});}});
 app.delete("/api/community/offers/:id",adminAuth,(req,res)=>{const offer=community.removeOffer(req.params.id);if(!offer)return res.status(404).json({success:false,message:"Offer not found."});res.json({success:true});});
 app.get("/api/config",(req,res)=>{res.set("Cache-Control","no-store");const s=limits.get();res.json({success:true,rates:limits.currentRates(),nextRateSchedule:limits.nextSchedule(),updatedAt:new Date().toISOString()})});
+app.get("/api/offers/recommend",(req,res)=>{res.set("Cache-Control","no-store, no-cache, must-revalidate, proxy-revalidate");const answers={country:String(req.query.country||""),offerNeed:String(req.query.offerNeed||""),firstTime:String(req.query.firstTime||""),useCase:String(req.query.useCase||"")};const seed=Math.max(0,Number(req.query.seed)||0);res.json({success:true,enabled:offers.get().enabled,rotateOnRefresh:offers.get().rotateOnRefresh,offers:offers.recommend(answers,seed)})});
+app.post("/api/onboarding",(req,res)=>{try{const visitor=onboarding.save(req.body||{});res.json({success:true,visitor,offers:offers.recommend(req.body||{},0)})}catch(e){res.status(400).json({success:false,message:e.message||"Invalid onboarding."})}});
+app.get("/api/admin/offers",adminAuth,(req,res)=>{const s=offers.get();res.json({success:true,settings:{enabled:s.enabled,rotateOnRefresh:s.rotateOnRefresh,requireOnboarding:s.requireOnboarding,supportUrl:s.supportUrl},offers:(s.offers||[]).slice().reverse()})});
+app.put("/api/admin/offers/settings",adminAuth,(req,res)=>res.json({success:true,settings:offers.settings(req.body||{})}));
+app.post("/api/admin/offers",adminAuth,(req,res)=>{try{res.json({success:true,offer:offers.add(req.body||{})})}catch(e){res.status(400).json({success:false,message:e.message||"Invalid offer."})}});
+app.put("/api/admin/offers/:id",adminAuth,(req,res)=>{try{const item=offers.updateOffer(req.params.id,req.body||{});if(!item)return res.status(404).json({success:false,message:"Offer not found."});res.json({success:true,offer:item})}catch(e){res.status(400).json({success:false,message:e.message||"Invalid offer."})}});
+app.delete("/api/admin/offers/:id",adminAuth,(req,res)=>{const item=offers.remove(req.params.id);if(!item)return res.status(404).json({success:false,message:"Offer not found."});res.json({success:true})});
+app.get("/api/admin/onboarding",adminAuth,(req,res)=>res.json({success:true,visitors:onboarding.list()}));
 app.get("/api/admin/settings",adminAuth,(req,res)=>res.json({success:true,settings:limits.get()}));
 app.put("/api/admin/rates",adminAuth,(req,res)=>{try{const rates=limits.setRates(req.body||{});res.json({success:true,rates,updatedAt:new Date().toISOString()})}catch(e){res.status(400).json({success:false,message:e.message||"Invalid rates."})}});
 app.get("/api/admin/rate-schedules",adminAuth,(req,res)=>res.json({success:true,schedules:limits.get().rateSchedules||[]}));
