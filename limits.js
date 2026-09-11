@@ -7,7 +7,8 @@ const DEFAULTS={
  rates:{MZN:65,AOA:950,ZAR:18.5,USD:1.02},
  rateSchedules:[],
  announcements:[],
-  supportUrl:"contact.html"
+  supportUrl:"contact.html",
+ controls:{acceptNewOrders:true,MZN:true,AOA:true,ZAR:true,USD:true,community:true,emailNotifications:true}
 };
 function ensure(){if(!fs.existsSync(dir))fs.mkdirSync(dir,{recursive:true});if(!fs.existsSync(file))fs.writeFileSync(file,JSON.stringify(DEFAULTS,null,2));}
 function read(){ensure();try{return {...DEFAULTS,...JSON.parse(fs.readFileSync(file,"utf8"))}}catch{return {...DEFAULTS}}}
@@ -53,5 +54,7 @@ function update(patch){const next={...read(),...patch};next.maxActiveOrdersPerCu
  next.rates={...DEFAULTS.rates,...(next.rates||{})};
  next.rateSchedules=Array.isArray(next.rateSchedules)?next.rateSchedules.slice(-100):[];
  next.announcements=Array.isArray(next.announcements)?next.announcements.slice(-200):[];
+ const oldControls=(read().controls)||DEFAULTS.controls; next.controls={...DEFAULTS.controls,...oldControls,...(next.controls||{})}; for(const k of Object.keys(DEFAULTS.controls)) next.controls[k]=Boolean(next.controls[k]);
  write(next);return next}
-module.exports={get,update,file,DEFAULTS,currentRates,rateVersion,nextSchedule,setRates,addRateSchedule,removeRateSchedule,addAnnouncement};
+function updateControls(patch={}){const d=read();d.controls={...DEFAULTS.controls,...(d.controls||{}),...(patch||{})};for(const k of Object.keys(DEFAULTS.controls))d.controls[k]=Boolean(d.controls[k]);write(d);return d.controls}
+module.exports={get,update,file,DEFAULTS,currentRates,rateVersion,nextSchedule,setRates,addRateSchedule,removeRateSchedule,addAnnouncement,updateControls};

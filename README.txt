@@ -42,3 +42,14 @@ KOIN V20 additions
 - Account balance/custody is NOT enabled in this version.
 
 Production note: connect a compliant payment processor for real card tokenization/charging. Do not collect raw card data in KOIN.
+
+
+V33 — CONTROL CENTER
+- Added admin Control Center with server-side ON/OFF switches.
+- New orders can be disabled without taking the admin offline.
+- MZN/AOA/ZAR/USD markets can be independently disabled.
+- Community can be independently disabled.
+- Personalized offers can be independently disabled.
+- Customer email notifications can be independently disabled.
+- Settings persist through DATA_DIR storage.
+- Existing V32 architecture remains the base; no customer accounts/login/2FA added.
