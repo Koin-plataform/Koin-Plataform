@@ -6,14 +6,12 @@ RUN
 3. Create .env from .env.example (a local .env is included in this development package with the selected admin login).
 4. Add a REAL Resend API key and a verified MAIL_FROM address.
 5. Set PUBLIC_URL to the real HTTPS KOIN address in production.
-6. In Render production, attach a persistent disk and set DATA_DIR to its mount path (for example /var/data).
-7. Keep payment proofs out of the public static directory; KOIN serves them only through the admin route.
-8. Run: npm start
-9. Customer site: http://localhost:3000
-10. Admin: http://localhost:3000/admin.html
+6. Run: npm start
+7. Customer site: http://localhost:3000
+8. Admin: http://localhost:3000/admin.html
 
 CUSTOMER EMAILS
-Orders, customers, offers, settings, onboarding data and community data are stored under DATA_DIR. Payment proofs are stored under DATA_DIR/uploads/proofs. For Render production, DATA_DIR must point to a persistent disk mount (for example /var/data); the free ephemeral filesystem is not persistent. The customer receives notifications for order creation, payment report, payment confirmation and completion. Every message includes the order details and a direct tracking link. Email attempts are recorded on the order. The customer never needs to keep the website open during the 20-minute processing window.
+Every order is persisted in database/orders.json. The customer receives notifications for order creation, payment report, payment confirmation and completion. Every message includes the order details and a direct tracking link. Email attempts are recorded on the order. The customer never needs to keep the website open during the 20-minute processing window.
 
 REAL EMAIL DELIVERY
 KOIN uses Resend over HTTPS. A real RESEND_API_KEY and a verified MAIL_FROM domain/address are mandatory for real external delivery. A placeholder key is rejected. The admin panel includes a real delivery test and a resend action.

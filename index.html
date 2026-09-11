@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -59,7 +59,7 @@
         <option value="USD">USD</option>
       </select>
 
-      
+      <button type="button" class="header-order-btn" id="myOrdersBtn">My orders</button>
 
     </div>
 
@@ -100,9 +100,9 @@
             How it works
           </a>
 
-          
+          <button type="button" class="secondary-button track-home-btn" id="trackHomeBtn">Track an order</button>
 
-          
+          <a href="p2p.html" class="secondary-button p2p-home-btn">P2P Market</a>
 
         </div>
 
@@ -317,9 +317,9 @@
     <section class="section offer-section" id="recommendedOffer" hidden>
       <div class="offer-shell">
         <div class="offer-copy">
-          <span class="eyebrow">FOR YOUR PROFILE</span>
-          <h2>Offer prepared for you.</h2>
-          <p id="offerIntro">Based on your initial answers, these are the options available for your market.</p>
+          <span class="eyebrow">PARA O TEU PERFIL</span>
+          <h2>Oferta preparada para ti.</h2>
+          <p id="offerIntro">Com base nas respostas iniciais, estas são as opções disponíveis para o teu mercado.</p>
           <div class="offer-profile" id="offerProfile"></div>
         </div>
         <div class="recommended-offer-card" id="recommendedOfferCard"></div>
@@ -339,7 +339,8 @@
         </h2>
 
         <p data-i18n="buyDescription">
-          A KOIN account is required to create and access orders. Manage your purchases securely from your account.
+          No customer account is required. Provide the information
+          required for your order and follow the payment instructions.
         </p>
 
 
@@ -473,14 +474,14 @@
 
 
         <div class="field">
-          <label for="checkoutCurrencyHome">Payment currency</label>
+          <label for="checkoutCurrencyHome">Moeda de pagamento</label>
           <select id="checkoutCurrencyHome" class="checkout-currency-home">
             <option value="MZN">🇲🇿 MZN</option>
             <option value="AOA">🇦🇴 AOA</option>
             <option value="ZAR">🇿🇦 ZAR</option>
             <option value="USD">🇺🇸 USD</option>
           </select>
-          <small>Price and total update immediately.</small>
+          <small>O preço e o total mudam imediatamente.</small>
         </div>
 
         <div class="field">
@@ -553,7 +554,7 @@
           </div>
 
           <div>
-            <span data-i18n="networkFee">KOIN service fee</span>
+            <span data-i18n="networkFee">Network fee</span>
             <strong id="networkFee">0.00 USDT</strong>
           </div>
 
@@ -606,7 +607,7 @@
         </h2>
 
         <p data-i18n="processDescription">
-          A simple order flow with an authenticated KOIN account.
+          A simple order flow. Orders are tracked by your order reference and the email you provide at checkout.
         </p>
 
       </div>
@@ -811,6 +812,22 @@
   </footer>
 
 
+  <!-- ORDER CENTER -->
+  <div class="order-center" id="orderCenter" aria-hidden="true">
+    <div class="order-center-backdrop" id="orderCenterBackdrop"></div>
+    <section class="order-center-panel" role="dialog" aria-modal="true" aria-labelledby="orderCenterTitle">
+      <button type="button" class="modal-close" id="closeOrderCenter" aria-label="Close">×</button>
+      <span class="eyebrow">ORDER CENTER</span>
+      <h2 id="orderCenterTitle">Track your orders</h2>
+      <p class="modal-subtitle">Orders created in this browser appear here. You can also enter a reference manually.</p>
+      <div class="track-form">
+        <input id="trackReference" type="text" placeholder="KOIN-20260909-ABC123" autocomplete="off">
+        <button type="button" class="primary-button modal-track" id="trackReferenceBtn">Track order →</button>
+      </div>
+      <div id="orderHistory" class="order-history"></div>
+    </section>
+  </div>
+
   <!-- COOKIE -->
   <div class="cookie-banner" id="cookieBanner">
 
@@ -869,30 +886,30 @@
     <div id="welcomeNotice" class="welcome-notice">
       <div class="welcome-kicker">ANTES DE CONTINUAR</div>
       <h2>Leia antes de prosseguir.</h2>
-      <p>This platform uses third-party payment methods in certain regions, including Mozambique, Angola and South Africa. KOIN does not control funds held by those payment services. Always verify transaction details and use available payment methods carefully.</p>
-      <p>Payment support varies by country and offers may change frequently. Choose the timing that works best for your transaction. Cookies and local storage may be used to remember preferences and keep the site flow working.</p>
+      <p>Este site usa métodos de pagamento de terceiros em determinadas regiões, como Moçambique, Angola e África do Sul. A KOIN não controla os fundos mantidos nesses serviços de pagamento. Confirme sempre os dados da operação e use os métodos disponíveis com prudência.</p>
+      <p>O suporte de pagamentos varia por país e as ofertas podem ser atualizadas com frequência. Escolha o melhor momento para a sua operação. Os cookies e o armazenamento local podem ser usados para guardar preferências e manter o fluxo do site.</p>
       <div class="welcome-notice-actions"><a href="contact.html" class="secondary-button">Saber mais</a><button class="primary-button" id="welcomeContinue">OK, continuar <span>→</span></button></div>
     </div>
     <div id="welcomeQuiz" hidden>
       <div class="welcome-kicker">WELCOME TO コイン</div>
-      <h2>Let’s prepare your offer.</h2>
-      <p>Answer a few quick questions to show the most relevant market and offers.</p>
+      <h2>Vamos preparar a tua oferta.</h2>
+      <p>Responde rápido. As respostas ajudam a mostrar o mercado e as ofertas mais relevantes.</p>
       <div class="welcome-step" data-step="1">
-        <span class="welcome-count">01 / 05</span><h3>What is your name?</h3>
-        <input class="welcome-input" id="welcomeName" type="text" maxlength="80" placeholder="Your name">
+        <span class="welcome-count">01 / 05</span><h3>Qual é o teu nome?</h3>
+        <input class="welcome-input" id="welcomeName" type="text" maxlength="80" placeholder="O teu nome">
         <button class="welcome-next primary-button" data-next="1">Continuar <span>→</span></button>
       </div>
       <div class="welcome-step" data-step="2" hidden>
-        <span class="welcome-count">02 / 05</span><h3>What is your country?</h3>
-        <div class="welcome-options"><button data-answer="country" data-value="MZN">🇲🇿 Mozambique</button><button data-answer="country" data-value="AOA">🇦🇴 Angola</button><button data-answer="country" data-value="ZAR">🇿🇦 South Africa</button><button data-answer="country" data-value="USD">🌎 International / USD</button></div>
+        <span class="welcome-count">02 / 05</span><h3>Qual é o teu país?</h3>
+        <div class="welcome-options"><button data-answer="country" data-value="MZN">🇲🇿 Moçambique</button><button data-answer="country" data-value="AOA">🇦🇴 Angola</button><button data-answer="country" data-value="ZAR">🇿🇦 África do Sul</button><button data-answer="country" data-value="USD">🌎 Internacional / USD</button></div>
       </div>
       <div class="welcome-step" data-step="3" hidden>
-        <span class="welcome-count">03 / 05</span><h3>What are you looking for?</h3>
-        <div class="welcome-options"><button data-answer="offerNeed" data-value="buy">Buy USDT</button><button data-answer="offerNeed" data-value="best_price">Best price / offer</button><button data-answer="offerNeed" data-value="community">Find a community offer</button><button data-answer="offerNeed" data-value="explore">Explore options</button></div>
+        <span class="welcome-count">03 / 05</span><h3>Que oferta procuras?</h3>
+        <div class="welcome-options"><button data-answer="offerNeed" data-value="buy">Comprar USDT</button><button data-answer="offerNeed" data-value="best_price">Melhor preço/oferta</button><button data-answer="offerNeed" data-value="community">Encontrar oferta na comunidade</button><button data-answer="offerNeed" data-value="explore">Explorar opções</button></div>
       </div>
       <div class="welcome-step" data-step="4" hidden>
-        <span class="welcome-count">04 / 05</span><h3>Is this your first time on this site?</h3>
-        <div class="welcome-options"><button data-answer="firstTime" data-value="yes">Yes, first time</button><button data-answer="firstTime" data-value="no">No, I have used it before</button></div>
+        <span class="welcome-count">04 / 05</span><h3>É a tua primeira vez neste site?</h3>
+        <div class="welcome-options"><button data-answer="firstTime" data-value="yes">Sim, primeira vez</button><button data-answer="firstTime" data-value="no">Não, já usei</button></div>
       </div>
       <div class="welcome-step" data-step="5" hidden>
         <span class="welcome-count">05 / 05</span><h3>Como pretendes usar os dólares?</h3>

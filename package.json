@@ -2,7 +2,7 @@
   "name": "koin-usdt-desk",
   "version": "2.0.1",
   "private": true,
-  "description": "KŌIN コイン — customer checkout and operator dashboard",
+  "description": "K\u014cIN コイン \u2014 customer checkout and operator dashboard",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

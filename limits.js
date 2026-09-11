@@ -1,5 +1,5 @@
 "use strict";
-const fs=require("fs");const storage=require("./storage");const path=require("path");
+const fs=require("fs");const path=require("path");const storage=require("./storage");
 const dir=storage.DATA_DIR;const file=path.join(dir,"settings.json");const crypto=require("crypto");
 const DEFAULTS={
  maxActiveOrdersPerCustomer:3,maxOrdersPerCustomer24h:5,maxUSDTPerCustomer24h:100000,maxSiteOrders24h:100,maxSameAmountPerCustomer24h:2,orderLimitsEnabled:true,

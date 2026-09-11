@@ -1391,8 +1391,6 @@ footer {
    COOKIE
 ========================= */
 
-.cookie-banner.hidden { display:none !important; }
-
 .cookie-banner {
   position: fixed;
 
@@ -2350,5 +2348,3 @@ img, svg, video, iframe, canvas {
 
 /* V16: scheduled announcements are modal; price updates remain corner toasts. */
 .announcement-modal{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}.announcement-modal.show{display:flex}.announcement-backdrop{position:absolute;inset:0;background:rgba(2,7,12,.78);backdrop-filter:blur(10px)}.announcement-card{position:relative;width:min(520px,100%);padding:28px;border:1px solid #26323e;border-radius:22px;background:linear-gradient(180deg,#101820,#080d13);box-shadow:0 24px 90px rgba(0,0,0,.55);text-align:center}.announcement-kicker{font-size:10px;font-weight:900;letter-spacing:1.8px;color:#20c997}.announcement-icon{width:48px;height:48px;border-radius:50%;margin:14px auto;border:1px solid rgba(32,201,151,.35);display:grid;place-items:center;color:#20c997;font-weight:900;font-size:20px}.announcement-card h3{margin:6px 0 8px;font-size:24px}.announcement-card p{margin:0 auto;color:#8c9aa7;line-height:1.6;max-width:430px}.announcement-actions{display:flex;justify-content:center;gap:10px;margin-top:22px;flex-wrap:wrap}.price-toast{right:22px!important;left:auto!important;bottom:22px!important;top:auto!important;transform:translateY(18px)!important}.price-toast.show{transform:translateY(0)!important}@media(max-width:520px){.announcement-card{padding:22px}.announcement-card h3{font-size:20px}.announcement-actions>*{width:100%;text-align:center;box-sizing:border-box}}
-
-.welcome-auth-tabs{display:flex;gap:8px;padding:5px;background:rgba(255,255,255,.035);border:1px solid var(--border);border-radius:14px;margin:20px 0 16px}.welcome-auth-tab{flex:1;border:0;background:transparent;color:var(--muted);padding:11px;border-radius:10px;font-weight:800;cursor:pointer}.welcome-auth-tab.active{background:rgba(32,201,151,.12);color:var(--text)}.welcome-auth-form{max-width:520px;margin:auto;text-align:left}.welcome-field{margin:12px 0}.welcome-field label{display:block;font-size:12px;font-weight:800;margin-bottom:7px}.welcome-field input{width:100%;box-sizing:border-box;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.035);color:var(--text);outline:none}.welcome-auth-form .primary-button{width:100%;justify-content:center;margin-top:8px}.welcome-auth-form .notice{min-height:18px}

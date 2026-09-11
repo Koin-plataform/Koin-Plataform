@@ -1,7 +1,8 @@
 "use strict";
-const fs=require("fs");const storage=require("./storage");
+const fs=require("fs");
 const path=require("path");
 const crypto=require("crypto");
+const storage=require("./storage");
 const dir=storage.DATA_DIR;
 const file=path.join(dir,"offers.json");
 const DEFAULTS={
@@ -10,33 +11,19 @@ const DEFAULTS={
   requireOnboarding:true,
   supportUrl:"contact.html",
   version:1,
+  defaultSeedVersion:2,
   offers:[]
 };
 function seedDefaults(){
  const base=[
-  ["MZN","Oferta MZN — Compra rápida",68,"buy","any","any",5],
-  ["MZN","Oferta MZN — Arbitragem",65,"best_price","any","arbitrage",30],
-  ["MZN","Oferta MZN — Pessoal",67,"buy","any","personal",30],
-  ["MZN","Oferta MZN — Comercial",70,"buy","any","commercial",30],
-
-  ["AOA","Oferta AOA — Compra rápida",975,"buy","any","any",5],
-  ["AOA","Oferta AOA — Arbitragem",950,"best_price","any","arbitrage",30],
-  ["AOA","Oferta AOA — Pessoal",975,"buy","any","personal",30],
-  ["AOA","Oferta AOA — Comercial",1000,"buy","any","commercial",30],
-
-  ["ZAR","Oferta ZAR — Compra rápida",20,"buy","any","any",5],
-  ["ZAR","Oferta ZAR — Arbitragem",18.5,"best_price","any","arbitrage",30],
-  ["ZAR","Oferta ZAR — Pessoal",20,"buy","any","personal",30],
-  ["ZAR","Oferta ZAR — Comercial",22,"buy","any","commercial",30],
-
-  ["USD","Oferta USD — Compra rápida",1.06,"buy","any","any",5],
-  ["USD","Oferta USD — Arbitragem",1.02,"best_price","any","arbitrage",30],
-  ["USD","Oferta USD — Pessoal",1.06,"buy","any","personal",30],
-  ["USD","Oferta USD — Comercial",1.10,"buy","any","commercial",30]
+  ["MZN","Oferta MZN — Arbitragem",65,"best_price","any","arbitrage"],["MZN","Oferta MZN — Compra rápida",66,"buy","any","any"],["MZN","Oferta MZN — Melhor preço",68,"best_price","any","personal"],["MZN","Oferta MZN — Comercial",70,"buy","any","commercial"],
+  ["AOA","Oferta AOA — Arbitragem",950,"best_price","any","arbitrage"],["AOA","Oferta AOA — Compra rápida",955,"buy","any","any"],["AOA","Oferta AOA — Melhor preço",975,"best_price","any","personal"],["AOA","Oferta AOA — Comercial",1000,"buy","any","commercial"],
+  ["ZAR","Oferta ZAR — Arbitragem",18.5,"best_price","any","arbitrage"],["ZAR","Oferta ZAR — Compra rápida",19,"buy","any","any"],["ZAR","Oferta ZAR — Melhor preço",20,"best_price","any","personal"],["ZAR","Oferta ZAR — Comercial",22,"buy","any","commercial"],
+  ["USD","Oferta USD — Arbitragem",1.02,"best_price","any","arbitrage"],["USD","Oferta USD — Compra rápida",1.03,"buy","any","any"],["USD","Oferta USD — Melhor preço",1.06,"best_price","any","personal"],["USD","Oferta USD — Comercial",1.10,"buy","any","commercial"]
  ];
- return base.map((x,i)=>({id:"OFF-DEFAULT-"+(i+1),title:x[1],label:"Oferta KOIN",countries:[x[0]],currency:x[0],price:x[2],unit:"per USDT",offerNeeds:[x[3]],firstTime:x[4],useCase:x[5],network:"",note:"Oferta padrão editável no painel KOIN.",priority:x[6],active:true,startAt:null,endAt:null,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}));
+ return base.map((x,i)=>({id:"OFF-DEFAULT-"+(i+1),title:x[1],label:"Oferta KOIN",countries:[x[0]],currency:x[0],price:x[2],unit:"per USDT",offerNeeds:[x[3]],firstTime:x[4],useCase:x[5],network:"",note:"Oferta padrão editável no painel KOIN.",priority:10,active:true,startAt:null,endAt:null,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}));
 }
-function ensure(){if(!fs.existsSync(dir))fs.mkdirSync(dir,{recursive:true});if(!fs.existsSync(file)){const d={...DEFAULTS,version:1,offers:seedDefaults()};fs.writeFileSync(file,JSON.stringify(d,null,2));}}
+function ensure(){if(!fs.existsSync(dir))fs.mkdirSync(dir,{recursive:true});if(!fs.existsSync(file)){const d={...DEFAULTS,version:1,defaultSeedVersion:2,offers:seedDefaults()};fs.writeFileSync(file,JSON.stringify(d,null,2));}}
 function read(){ensure();try{const x=JSON.parse(fs.readFileSync(file,"utf8"))||{};const d={...DEFAULTS,...x,offers:Array.isArray(x.offers)&&x.offers.length?x.offers:seedDefaults()};return migrateDefaults(d)}catch{return {...DEFAULTS,offers:seedDefaults()}}}
 function write(d){ensure();const tmp=file+".tmp";fs.writeFileSync(tmp,JSON.stringify({...DEFAULTS,...d,version:Number(d.version||1)},null,2));fs.renameSync(tmp,file)}
 function get(){return read()}
@@ -56,9 +43,10 @@ function isActive(o,now=Date.now()){
 function matches(o,a){
  const country=a.countries[0]||"";
  if(Array.isArray(o.countries)&&o.countries.length&& !o.countries.includes("ALL") && !o.countries.includes(country))return false;
- if(Array.isArray(o.offerNeeds)&&o.offerNeeds.length && !o.offerNeeds.includes("ALL") && !a.offerNeeds.some(x=>o.offerNeeds.includes(x)))return false;
+ if(a.useCase && a.useCase!=="any" && o.useCase && o.useCase!=="any" && o.useCase!==a.useCase)return false;
+ if(a.useCase==="any" && Array.isArray(o.offerNeeds)&&o.offerNeeds.length && !o.offerNeeds.includes("ALL") && !a.offerNeeds.some(x=>o.offerNeeds.includes(x)))return false;
  if(o.firstTime&&o.firstTime!=="any"&&o.firstTime!==a.firstTime)return false;
- if(o.useCase&&o.useCase!=="any"&&o.useCase!==a.useCase)return false;
+ if(a.useCase!=="any" && (!o.useCase || o.useCase==="any") && Array.isArray(o.offerNeeds)&&o.offerNeeds.length && !o.offerNeeds.includes("ALL") && !a.offerNeeds.some(x=>o.offerNeeds.includes(x)))return false;
  return true;
 }
 function listMatching(answers={}){
@@ -68,16 +56,29 @@ function listMatching(answers={}){
 }
 function publicOffer(o){return {id:o.id,title:o.title,country:o.countries?.[0]||"ALL",currency:o.currency,price:Number(o.price||0),unit:o.unit||"per USDT",offerNeed:o.offerNeeds||[],firstTime:o.firstTime||"any",useCase:o.useCase||"any",network:o.network||"",note:o.note||"",label:o.label||"Oferta KOIN",updatedAt:o.updatedAt||o.createdAt||null};}
 function recommend(answers={},seed=0){
- const d=read();const list=listMatching(answers).map(publicOffer);if(!list.length)return [];
+ const d=read();let list=listMatching(answers);
+ const requestedUseCase=["personal","arbitrage","commercial"].includes(String(answers.useCase||""))?String(answers.useCase):"any";
+ if(requestedUseCase!=="any"){const exact=list.filter(o=>o.useCase===requestedUseCase);if(exact.length)list=exact;}
+ list=list.map(publicOffer);if(!list.length)return [];
  if(!d.rotateOnRefresh)return list.slice(0,3);
  const n=Math.max(0,Number(seed)||0);const shift=n%list.length;const rotated=list.slice(shift).concat(list.slice(0,shift));return rotated.slice(0,3);
 }
 const PRICE_RULES={MZN:{min:65,max:70,step:1},AOA:{min:950,max:1000,step:1},ZAR:{min:18.5,max:22,step:1},USD:{min:1.02,max:1.1,step:0.01}};
-function validatePrice(currency,price){const c=String(currency||"MZN").toUpperCase();const r=PRICE_RULES[c];if(!r)return;const n=Number(price);if(!Number.isFinite(n)||n<r.min||n>r.max)throw new Error(`Preço ${c} deve estar entre ${r.min} e ${r.max}.`);const decimals=r.step<1?2:0;const rounded=Number(n.toFixed(decimals));if(Math.abs(n-rounded)>1e-9)throw new Error(`Preço ${c} deve usar valores redondos.`);const steps=(n-r.min)/r.step;if(Math.abs(steps-Math.round(steps))>1e-9)throw new Error(`Preço ${c} deve respeitar o intervalo definido.`);}
+function validatePrice(currency,price){const c=String(currency||"MZN").toUpperCase();const r=PRICE_RULES[c];if(!r)return;const n=Number(price);if(!Number.isFinite(n)||n<r.min||n>r.max)throw new Error(`Preço ${c} deve estar entre ${r.min} e ${r.max}.`);const scaled=Math.round((n/r.step))*r.step;if(Math.abs(n-scaled)>1e-9)throw new Error(`Preço ${c} deve respeitar o incremento permitido.`);}
 function migrateDefaults(d){
  let changed=false;
  const defaults=seedDefaults();
  const existing=new Map((d.offers||[]).map(o=>[o.id,o]));
+ if(Number(d.defaultSeedVersion||1)<2){
+   for(const def of defaults){
+     const old=existing.get(def.id);
+     if(old){
+       const isUntouchedDefault=old.label==="Oferta KOIN" && String(old.note||"").includes("Oferta padrão editável");
+       if(isUntouchedDefault){Object.assign(old,def);changed=true;}
+     }
+   }
+   d.defaultSeedVersion=2; changed=true;
+ }
  for(const def of defaults){
    if(!existing.has(def.id)){ d.offers=(d.offers||[]).concat(def); changed=true; }
  }
