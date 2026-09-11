@@ -2348,3 +2348,11 @@ img, svg, video, iframe, canvas {
 
 /* V16: scheduled announcements are modal; price updates remain corner toasts. */
 .announcement-modal{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}.announcement-modal.show{display:flex}.announcement-backdrop{position:absolute;inset:0;background:rgba(2,7,12,.78);backdrop-filter:blur(10px)}.announcement-card{position:relative;width:min(520px,100%);padding:28px;border:1px solid #26323e;border-radius:22px;background:linear-gradient(180deg,#101820,#080d13);box-shadow:0 24px 90px rgba(0,0,0,.55);text-align:center}.announcement-kicker{font-size:10px;font-weight:900;letter-spacing:1.8px;color:#20c997}.announcement-icon{width:48px;height:48px;border-radius:50%;margin:14px auto;border:1px solid rgba(32,201,151,.35);display:grid;place-items:center;color:#20c997;font-weight:900;font-size:20px}.announcement-card h3{margin:6px 0 8px;font-size:24px}.announcement-card p{margin:0 auto;color:#8c9aa7;line-height:1.6;max-width:430px}.announcement-actions{display:flex;justify-content:center;gap:10px;margin-top:22px;flex-wrap:wrap}.price-toast{right:22px!important;left:auto!important;bottom:22px!important;top:auto!important;transform:translateY(18px)!important}.price-toast.show{transform:translateY(0)!important}@media(max-width:520px){.announcement-card{padding:22px}.announcement-card h3{font-size:20px}.announcement-actions>*{width:100%;text-align:center;box-sizing:border-box}}
+
+/* V34: clear market availability state */
+.rate-card{position:relative}
+.rate-availability{display:inline-flex;align-items:center;justify-content:center;margin-top:9px;padding:4px 8px;border-radius:999px;border:1px solid rgba(32,201,151,.18);background:rgba(32,201,151,.06);color:#20c997;font-size:9px;font-weight:900;letter-spacing:.6px}
+.rate-card.market-unavailable{opacity:.62;border-color:rgba(255,255,255,.08);filter:saturate(.65)}
+.rate-card.market-unavailable:hover{transform:none;border-color:rgba(255,255,255,.12)}
+.rate-card.market-unavailable .rate{color:#8b97a1;text-decoration:line-through;text-decoration-thickness:1px}
+.rate-card.market-unavailable .rate-availability{border-color:rgba(255,120,120,.20);background:rgba(255,80,80,.06);color:#ff9b9b}

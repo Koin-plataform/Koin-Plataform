@@ -20,7 +20,22 @@ const I18N={en:{available:"コイン is available",emailPlaceholder:"Enter your 
 function applyLanguage(lang){const d=I18N[lang]||I18N.en;document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.dataset.i18n;if(d[k])el.textContent=d[k]});document.querySelectorAll("[data-placeholder]").forEach(el=>{const k=el.dataset.placeholder;if(d[k])el.placeholder=d[k]});document.documentElement.lang=lang;localStorage.setItem("koinLanguage",lang)}
 const savedLanguage=localStorage.getItem("koinLanguage")||"en";if($("language")){ $("language").value=savedLanguage; applyLanguage(savedLanguage); $("language").addEventListener("change",e=>applyLanguage(e.target.value));}
 // Live platform pricing: rates are controlled server-side by the operator.
-function applyKoinControls(c){const orderBtn=$("continueBtn");if(orderBtn){const market=country?.value||"MZN";const off=c.acceptNewOrders===false||c[market]===false;orderBtn.disabled=off||orderBtn.dataset.busy==="1";orderBtn.innerHTML=off?"Temporariamente indisponível":"Continue <span>→</span>";}["MZN","AOA","ZAR","USD"].forEach(k=>{document.querySelectorAll(`option[value="${k}"]`).forEach(o=>{const disabled=c[k]===false;o.disabled=disabled;if(disabled&&o.parentElement?.value===k){const first=[...o.parentElement.options].find(x=>!x.disabled);if(first)o.parentElement.value=first.value;}})});const cc=c.acceptNewOrders!==false&&(c[country?.value||"MZN"]!==false);if(!cc)show("New orders are temporarily unavailable for this market.");}
+function applyKoinControls(c){
+ const orderBtn=$("continueBtn");
+ const market=country?.value||"MZN";
+ if(orderBtn){const off=c.acceptNewOrders===false||c[market]===false;orderBtn.disabled=off||orderBtn.dataset.busy==="1";orderBtn.innerHTML=off?"Temporariamente indisponível":"Continue <span>→</span>";}
+ ["MZN","AOA","ZAR","USD"].forEach(k=>{
+  document.querySelectorAll(`option[value="${k}"]`).forEach(o=>{
+   const disabled=c[k]===false;o.disabled=disabled;
+   if(disabled&&o.parentElement?.value===k){const first=[...o.parentElement.options].find(x=>!x.disabled);if(first)o.parentElement.value=first.value;}
+  });
+  document.querySelectorAll(`.rate-card[data-market="${k}"]`).forEach(card=>{
+   const disabled=c[k]===false;card.classList.toggle("market-unavailable",disabled);
+   const badge=card.querySelector(`[data-availability="${k}"]`);if(badge)badge.textContent=disabled?"INDISPONÍVEL":"Disponível";
+  });
+ });
+ const cc=c.acceptNewOrders!==false&&(c[market]!==false);if(!cc)show("Este mercado está temporariamente indisponível.");
+}
 async function syncPlatformConfig(showChange=true){try{const r=await fetch("/api/config?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const d=await r.json();if(!d.success||!d.rates)return;window.koinControls=d.controls||{};applyKoinControls(d.controls||{});const previous=localStorage.getItem("koinRateVersion");Object.keys(d.rates).forEach(k=>{if(CONFIG.currencies[k])CONFIG.currencies[k].price=Number(d.rates[k])});document.querySelectorAll(".rate-card").forEach(card=>{const strong=card.querySelector(".rate"),label=card.querySelector(".rate-label");if(!strong)return;const key=(card.querySelector(".coin strong")?.textContent||"").split("/")[1]?.trim();if(key&&CONFIG.currencies[key]){strong.textContent=Number(CONFIG.currencies[key].price).toFixed(2);if(label)label.textContent=key+" per USDT"}});if(!selectedOffer)update();if(showChange&&previous&&d.rateVersion&&previous!==d.rateVersion)showPriceToast("Price update","KOIN rates are now updated.");if(d.rateVersion)localStorage.setItem("koinRateVersion",d.rateVersion);if(d.nextRateSchedule)localStorage.setItem("koinNextRateSchedule",JSON.stringify(d.nextRateSchedule));else localStorage.removeItem("koinNextRateSchedule")}catch{}}
 function showPriceToast(title,text){let box=$("priceToast");if(!box){box=document.createElement("div");box.id="priceToast";box.className="platform-notice price-toast";document.body.appendChild(box)}box.innerHTML='<div class="platform-notice-icon">↻</div><div class="platform-notice-content"><strong>'+escapeHtml(title)+'</strong><p>'+escapeHtml(text)+'</p></div><button class="platform-notice-ok" aria-label="OK">OK</button>';box.classList.add("show");const ok=box.querySelector("button");if(ok)ok.onclick=()=>box.classList.remove("show");clearTimeout(window.__koinPriceToastTimer);window.__koinPriceToastTimer=setTimeout(()=>box.classList.remove("show"),5000)}
 function showPlatformNotice(title,text,announcementId=null,supportUrl="contact.html"){
@@ -35,17 +50,14 @@ async function syncAnnouncements(){
   const now=Date.now();
   const active=(d.announcements||[]).filter(x=>x.id&&Date.parse(x.startAt||x.at||0)<=now&&Date.parse(x.endAt||'2999-01-01')>=now);
   for(const a of active){
-   if(a.kind==='instant'){
-    if(!localStorage.getItem('koinInstantNotice_'+a.id)){showPlatformNotice('Aviso KOIN',a.text,a.id,a.supportUrl||'contact.html');localStorage.setItem('koinInstantNotice_'+a.id,'1');break;}
-    continue;
-   }
-   const repeat=Math.max(1,Number(a.repeatEveryMinutes)||60)*60000;
-   const last=Number(localStorage.getItem('koinNoticeLast_'+a.id)||0);
-   if(now-last>=repeat){showPlatformNotice('Aviso KOIN',a.text,a.id,a.supportUrl||'contact.html');localStorage.setItem('koinNoticeLast_'+a.id,String(now));break;}
+   const key='koinNoticeShown_'+a.id;
+   if(localStorage.getItem(key)==='1')continue;
+   showPlatformNotice('Aviso KOIN',a.text,a.id,a.supportUrl||'contact.html');
+   localStorage.setItem(key,'1');
+   break;
   }
  }catch{}
 }
-
 // Market chart rotation — presentation only; rates remain the platform reference rates.
 (function initMarketRotation(){
   const line=$('chartLine'), area=$('chartArea'), value=$('chartCurrencyValue'), market=$('chartMarketValue'), note=$('chartCycleText');
