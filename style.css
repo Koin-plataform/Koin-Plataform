@@ -2255,8 +2255,7 @@ img, svg, video, iframe, canvas {
 .pay-icon svg{width:54px;height:54px;display:block}
 .pay-icon .brand-img{width:54px;height:54px;display:block;object-fit:contain}
 .pay-icon .mpesa-img{width:58px;height:50px}
-.pay-icon .absa-img{width:52px;height:52px}
-@media(max-width:480px){.pay-card{min-height:118px;padding:12px 8px}.pay-icon{width:64px;height:64px}.pay-icon svg{width:54px;height:54px}.pay-icon .brand-img{width:54px;height:54px}.pay-icon .mpesa-img{width:58px;height:50px}.pay-icon .absa-img{width:52px;height:52px}}
+@media(max-width:480px){.pay-card{min-height:118px;padding:12px 8px}.pay-icon{width:64px;height:64px}.pay-icon svg{width:54px;height:54px}.pay-icon .brand-img{width:54px;height:54px}.pay-icon .mpesa-img{width:58px;height:50px}}
 
 
 /* PAYMENT BRAND POLISH */
@@ -2265,7 +2264,6 @@ img, svg, video, iframe, canvas {
 .pay-card .pay-icon svg,.pay-card .pay-icon img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
 .pay-card .brand-img{width:54px!important;height:54px!important;object-fit:contain!important}
 .pay-card .standardbank-img{width:60px!important;height:48px!important}
-.pay-card .absa-img{width:56px!important;height:56px!important}
 .chart-cycle-note{display:flex;align-items:center;gap:7px;margin-top:10px;color:var(--muted-2);font-size:9px;text-transform:uppercase;letter-spacing:1px}
 .chart-cycle-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px rgba(32,201,151,.7)}
 .nav-p2p,.p2p-home-btn{border-color:rgba(32,201,151,.28)!important;color:#a7f4dc!important}

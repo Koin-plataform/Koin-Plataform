@@ -14,10 +14,9 @@ function allowCreate(ip){const now=Date.now(),x=createAttempts.get(ip)||{n:0,t:n
 const DEFAULT_RATES={MZN:65,AOA:950,ZAR:18.5,USD:1.02};
 const FEES={TRC20:5,BEP20:3,ERC20:5,POLYGON:3,SOLANA:3};
 function minimumUSDT(network){const mins={TRC20:80,BEP20:200,ERC20:50,POLYGON:120,SOLANA:140};return mins[network]??50}
-const METHODS={MZN:["MPESA","ABSA","STANDARD_BANK","PAYPAL"],AOA:["BANK_TRANSFER","PAYPAL"],ZAR:["PAYPAL","STANDARD_BANK","ABSA"],USD:["CARD","PAYPAL"]};
+const METHODS={MZN:["MPESA","STANDARD_BANK","PAYPAL"],AOA:["BANK_TRANSFER","PAYPAL"],ZAR:["PAYPAL","STANDARD_BANK"],USD:["CARD","PAYPAL"]};
 const PAYMENT_DETAILS={
  MPESA:{label:"M-Pesa",title:"M-Pesa payment",fields:["Name","Number"],values:[process.env.MPESA_NAME||"KOIN TEST",process.env.MPESA_NUMBER||"84 000 0000"],instruction:"Send the exact total shown for your order, then enter the M-Pesa transaction ID below. No screenshot is required."},
- ABSA:{label:"ABSA",title:"ABSA bank transfer",fields:["Account name","Account number","Branch"],values:[process.env.ABSA_ACCOUNT_NAME||"KOIN TEST",process.env.ABSA_ACCOUNT||"0000000000",process.env.ABSA_BRANCH||"0000"],instruction:"Make the transfer using the details above, then upload your payment proof."},
  PAYPAL:{label:"PayPal",title:"PayPal payment",fields:["PayPal email"],values:[process.env.PAYPAL_EMAIL||"payments@example.com"],instruction:"Complete the payment to the PayPal account above, then upload your payment proof."},
  BANK_TRANSFER:{label:"Multicaixa / EMIS",title:"Multicaixa / EMIS",fields:["Entity","Reference"],values:[process.env.MULTICAIXA_ENTITY||"00000",process.env.MULTICAIXA_REFERENCE||"KOIN-TEST"],instruction:"Complete the payment with the entity and reference above, then upload your payment proof."},
  STANDARD_BANK:{label:"Standard Bank",title:"Standard Bank transfer",fields:["Account name","Account number","Branch"],values:[process.env.STANDARD_BANK_ACCOUNT_NAME||"KOIN TEST",process.env.STANDARD_BANK_ACCOUNT||"0000000000",process.env.STANDARD_BANK_BRANCH||"0000"],instruction:"Make the transfer using the details above, then upload your payment proof."},
