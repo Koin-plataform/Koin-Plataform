@@ -1,6 +1,6 @@
 {
   "name": "koin-usdt-desk",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "private": true,
   "description": "K\u014cIN コイン \u2014 customer checkout and operator dashboard",
   "main": "server.js",
