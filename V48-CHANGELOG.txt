@@ -1,0 +1,13 @@
+KOIN V48 — UI/CSS/ICONS/ROUTES REBUILD
+
+- Reworked final responsive layout with a canonical UI layer.
+- Navbar remains sticky/fixed while scrolling, including mobile.
+- No page zoom; viewport is locked to the intended responsive layout.
+- Checkout/status styles moved out of HTML into order.css and status.css.
+- Payment method icons are inline SVGs: instant/local/no broken image loading.
+- Payment cards standardized across M-Pesa, Standard Bank, PayPal, Multicaixa/EMIS and Cards.
+- Professional customer routes: /checkout/:reference and /track/:reference.
+- Old /order/:reference and /status/:reference now 301 redirect to clean routes.
+- Email status links now use /track/:reference.
+- Cancellation reason remains mandatory and is shown in status + customer email.
+- Admin payment rejection reason remains mandatory and is shown in status + customer email.

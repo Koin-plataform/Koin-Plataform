@@ -88,8 +88,10 @@ const pages={
 };
 for(const [url,file] of Object.entries(pages)) app.get(url,(req,res)=>res.sendFile(path.join(__dirname,file)));
 app.get("/admin",adminPage);
-app.get("/order/:reference",(req,res)=>res.sendFile(path.join(__dirname,"order.html")));
-app.get("/status/:reference",(req,res)=>res.sendFile(path.join(__dirname,"status.html")));
+app.get("/checkout/:reference",(req,res)=>res.sendFile(path.join(__dirname,"order.html")));
+app.get("/track/:reference",(req,res)=>res.sendFile(path.join(__dirname,"status.html")));
+app.get("/order/:reference",(req,res)=>res.redirect(301,"/checkout/"+encodeURIComponent(req.params.reference)));
+app.get("/status/:reference",(req,res)=>res.redirect(301,"/track/"+encodeURIComponent(req.params.reference)));
 
 // Legacy filename URLs redirect to the clean routes.
 const legacy={"/index.html":"/","/learn.html":"/learn","/p2p.html":"/community","/faq.html":"/faq","/contact.html":"/contact","/risk.html":"/risk","/terms.html":"/terms","/privacy.html":"/privacy","/cookies.html":"/cookies","/admin.html":"/admin","/admin-login.html":"/login"};

@@ -72,7 +72,7 @@ function allowed(currency,method){return METHODS[currency]?.includes(method)}
 function esc(s){return String(s??"").replace(/[&<>\"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]))}
 const publicUrl=()=>String(process.env.PUBLIC_URL||process.env.RENDER_EXTERNAL_URL||"http://localhost:3000").replace(/\/$/,"");
 function emailLayout(title,body,reference){
- const statusUrl=reference?`${publicUrl()}/status/${encodeURIComponent(reference)}`:publicUrl();
+ const statusUrl=reference?`${publicUrl()}/track/${encodeURIComponent(reference)}`:publicUrl();
  const safeUrl=esc(statusUrl);
  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;background:#07090d;color:#eef2f7;font-family:Arial,Helvetica,sans-serif;-webkit-text-size-adjust:100%"><div style="padding:28px 14px;background:radial-gradient(circle at 50% 0%,rgba(32,201,151,.12),transparent 42%),#07090d"><div style="width:100%;max-width:620px;margin:0 auto;background:#10151d;border:1px solid #26313d;border-radius:20px;overflow:hidden;box-shadow:0 18px 55px rgba(0,0,0,.35)">
  <div style="padding:22px 24px;border-bottom:1px solid #202a34;background:linear-gradient(135deg,#121a20,#0e1319)">
