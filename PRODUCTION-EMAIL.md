@@ -17,3 +17,7 @@ Before going live with a custom domain:
 For testing, Resend's `onboarding@resend.dev` sender is restricted by Resend to the account's own test recipient. A verified custom domain removes that test restriction.
 
 Never commit `.env` or a Resend API key to GitHub.
+
+
+## Brand avatar / BIMI
+The logo embedded in the email is controlled by Koin. The sender avatar shown by Gmail is controlled by Google account/profile data or, for organization brand indicators, BIMI eligibility. BIMI requires DMARC enforcement (quarantine/reject, pct=100) and a VMC or CMC for Gmail-supported brand display. This is a deliverability/branding enhancement, not an application feature.

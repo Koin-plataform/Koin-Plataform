@@ -1,0 +1,8 @@
+KOIN V46
+
+- Expanded Terms, Privacy, Risk Disclosure, FAQ and Cookies pages using the current Koin order/payment model.
+- Clarified private/no-account design without promising anonymity or permanent KYC exemption.
+- Added language allowing identity/KYC requests when required for security, fraud prevention, payment partners, limits or applicable obligations.
+- Documented third-party payment providers, manual payment verification, manual USDT processing, network/price/wallet risks, data retention and technical security.
+- Added BIMI/avatar clarification to production email notes.
+- No visual redesign and no ABSA reintroduced.
