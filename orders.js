@@ -26,7 +26,31 @@ const proofDir=storage.PROOFS_DIR;
 fs.mkdirSync(proofDir,{recursive:true});
 const upload=multer({storage:multer.diskStorage({destination:(_,__,cb)=>cb(null,proofDir),filename:(_,file,cb)=>cb(null,Date.now()+"-"+crypto.randomBytes(6).toString("hex")+path.extname(file.originalname).toLowerCase())}),limits:{fileSize:5*1024*1024},fileFilter:(_,file,cb)=>cb(null,["image/jpeg","image/png","image/webp","application/pdf"].includes(file.mimetype))});
 function ref(){return "KOIN-"+new Date().toISOString().slice(0,10).replace(/-/g,"")+"-"+crypto.randomBytes(3).toString("hex").toUpperCase()}
-function publicOrder(o){if(!o)return null;const copy={...o};delete copy.proofPath;delete copy.emailLog;return copy}
+function publicOrder(o){
+ if(!o)return null;
+ // Public tracking must expose only fields the customer needs to follow/pay the order.
+ // Never expose customer email, internal IDs, proof paths, email logs or provider errors.
+ return {
+  reference:o.reference,
+  customerName:o.customerName,
+  amountUSDT:o.amountUSDT,
+  network:o.network,
+  networkFeeUSDT:o.networkFeeUSDT,
+  currency:o.currency,
+  unitPrice:o.unitPrice,
+  totalFiat:o.totalFiat,
+  walletAddress:o.walletAddress,
+  paymentMethod:o.paymentMethod||null,
+  paymentReference:o.paymentReference||null,
+  status:o.status,
+  proofOriginalName:o.proofOriginalName||null,
+  proofUploadedAt:o.proofUploadedAt||null,
+  processingDeadline:o.processingDeadline||null,
+  txid:o.txid||null,
+  createdAt:o.createdAt,
+  updatedAt:o.updatedAt
+ };
+}
 function validWallet(network,w){w=String(w||"").trim();if(network==="TRC20")return /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(w);if(["BEP20","ERC20","POLYGON"].includes(network))return /^0x[a-fA-F0-9]{40}$/.test(w);if(network==="SOLANA")return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(w);return false}
 function allowed(currency,method){return METHODS[currency]?.includes(method)}
 function esc(s){return String(s??"").replace(/[&<>\"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]))}
@@ -46,8 +70,17 @@ function emailLayout(title,body,reference){
  </div></div></body></html>`;
 }
 function orderDetailsHtml(o){return `<div style="margin:18px 0;padding:16px;background:#0b1017;border:1px solid #26323e;border-radius:12px"><p style="margin:4px 0"><b>Order:</b> ${esc(o.reference)}</p><p style="margin:4px 0"><b>Customer:</b> ${esc(o.customerName)}</p><p style="margin:4px 0"><b>Amount:</b> ${esc(o.amountUSDT)} USDT</p><p style="margin:4px 0"><b>Network:</b> ${esc(o.network)}</p><p style="margin:4px 0"><b>Network fee:</b> ${esc(o.networkFeeUSDT)} USDT</p><p style="margin:4px 0"><b>USDT price:</b> ${esc(o.unitPrice)} ${esc(o.currency)} / USDT</p><p style="margin:4px 0"><b>Total to pay:</b> ${esc(o.totalFiat)} ${esc(o.currency)}</p><p style="margin:4px 0;word-break:break-all"><b>Receiving wallet:</b> ${esc(o.walletAddress)}</p>${o.paymentMethod?`<p style="margin:4px 0"><b>Payment method:</b> ${esc(o.paymentMethod)}</p>`:""}${o.paymentReference?`<p style="margin:4px 0"><b>Payment reference:</b> ${esc(o.paymentReference)}</p>`:""}</div>`}
+function normalizeMailFrom(value){
+ let from=String(value||"").trim();
+ // Render environment values are sometimes entered with surrounding quotes.
+ from=from.replace(/^(?:"|\')|(?:"|\')$/g,"").trim();
+ const named=from.match(/^(.+?)\s*<([^<>\s@]+@[^<>\s@]+)>$/);
+ if(named)return `${named[1].trim()} <${named[2].trim()}>`;
+ if(/^[^<>\s@]+@[^<>\s@]+$/.test(from))return from;
+ return "";
+}
 async function sendEmail(to,subject,html){
- const recipient=String(to||"").trim(),apiKey=String(process.env.RESEND_API_KEY||"").trim(),from=String(process.env.MAIL_FROM||"").trim();
+ const recipient=String(to||"").trim(),apiKey=String(process.env.RESEND_API_KEY||"").trim(),from=normalizeMailFrom(process.env.MAIL_FROM);
  if(!recipient)return {sent:false,reason:"missing_recipient"};
  if(!apiKey||!from||apiKey.startsWith("re_xxxxxxxxx")){console.error("[EMAIL] NOT CONFIGURED — set a real RESEND_API_KEY and MAIL_FROM.");return {sent:false,reason:"email_not_configured"};}
  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
