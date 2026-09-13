@@ -1,0 +1,8 @@
+KOIN V45
+
+- Added assets/koin-email-logo.png using the new green crypto K logo.
+- Updated email header to use the Koin logo image.
+- Updated visible email brand text from コイン to Koin.
+- Updated health service label to Koin.
+
+Note: the sender avatar shown by Gmail/Outlook is controlled by the mailbox/provider. The logo inside the email is controlled by Koin. For a true brand avatar in supporting clients, BIMI/domain-brand configuration may be added separately.
