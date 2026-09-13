@@ -1,0 +1,23 @@
+KOIN V47 — UI / UX / CLEAN ROUTES / PAYMENT CANCELLATION
+
+1. Fixed malformed K logo markup across all HTML pages.
+2. Normalized customer-facing navigation to clean URLs:
+   /, /learn, /community, /faq, /contact, /risk, /terms, /privacy, /cookies
+   /login, /admin, /order/:reference, /status/:reference
+3. Legacy *.html URLs redirect to clean routes.
+4. Order/status pages now understand reference directly from the clean URL path.
+5. Prevented direct exposure of implementation HTML filenames through static serving.
+6. Added sticky, centered, viewport-safe layout behavior and disabled browser zoom on customer pages.
+7. Organized payment-method icons locally for instant loading:
+   M-Pesa, Standard Bank, PayPal, Multicaixa/EMIS, Cards.
+8. Removed the remote M-Pesa logo dependency that could delay rendering.
+9. Added explicit cancellation reason flow for customer cancellation.
+10. Cancellation reason is stored, exposed on public status, and included in the customer cancellation email.
+11. Added explicit admin payment-rejection reason flow.
+12. Payment rejection reason is stored, exposed on status, and included in the customer email.
+13. Cleaned remaining Koin branding references and internal customer links.
+14. HTML structure checked across all 13 HTML files; Node syntax checks passed for server.js, orders.js and app.js.
+
+IMPORTANT:
+- Persistent storage remains a deployment concern and is not changed by this UI release.
+- Real payment details must remain configured in the production environment before live use.

@@ -1,4 +1,4 @@
-コイン — customer USDT order platform
+Koin — customer USDT order platform
 
 RUN
 1. Install Node.js 22+.
