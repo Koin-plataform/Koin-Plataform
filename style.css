@@ -2597,3 +2597,14 @@ img,svg{
 }
 /* Clean utility pages */
 .auth-page,.status-shell{padding-bottom:40px}
+
+/* V49 — real brand marks, local first, no fake glyph treatment */
+.network-logo img{width:27px;height:27px;display:block;object-fit:contain}
+.network-logo.tron-logo{color:#dc062b;background:rgba(220,6,43,.08);border-color:rgba(220,6,43,.2)}
+.network-logo.bnb-logo{color:#f0b90b;background:rgba(240,185,11,.08);border-color:rgba(240,185,11,.2)}
+.network-logo.eth-logo{color:#627eea;background:rgba(98,126,234,.08);border-color:rgba(98,126,234,.2)}
+.network-logo.polygon-logo{color:#8247e5;background:rgba(130,71,229,.08);border-color:rgba(130,71,229,.2)}
+.network-logo.solana-logo{color:#9945ff;background:rgba(153,69,255,.08);border-color:rgba(153,69,255,.2)}
+.pay-icon img{width:34px;height:34px;display:block;object-fit:contain;border-radius:8px}
+.pay-icon .card-brands{display:flex;align-items:center;gap:3px}
+.pay-icon .card-brands img{width:26px;height:26px}

@@ -314,3 +314,9 @@
   padding:0 12px;
   font-size:12px
 }
+
+/* V49 payment brand marks */
+.pay-icon{display:grid;place-items:center;width:46px;height:46px;flex:0 0 46px;border-radius:12px;background:#0b1017;border:1px solid #26323e;overflow:hidden}
+.pay-icon img{width:34px;height:34px;display:block;object-fit:contain;background:transparent}
+.pay-icon .card-brands{display:flex;align-items:center;justify-content:center;gap:2px}
+.pay-icon .card-brands img{width:20px;height:20px}

@@ -1,0 +1,17 @@
+KOIN V49
+
+1. Email order summary simplified to ONLY:
+- Order reference
+- USDT amount
+- Network fee
+- Total to pay
+- Receiving wallet
+
+2. Cancellation reason remains explicit in cancellation email and tracking page.
+3. M-Pesa is explicitly named "M-Pesa Mozambique" in checkout/payment details.
+4. Payment method cards now use real brand marks where available, with local assets first.
+5. Crypto network marks updated to real Simple Icons brand marks with brand colors for BNB Chain, Ethereum, Polygon and Solana.
+6. Network card colors preserved: TRON red, BNB yellow, Ethereum blue, Polygon purple, Solana purple/green branding.
+7. Visa/Mastercard/PayPal brand marks are local assets.
+8. Existing Standard Bank asset is reused instead of a fabricated bank glyph.
+9. No business/order logic was intentionally changed beyond the payment label.
