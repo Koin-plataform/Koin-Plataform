@@ -1,0 +1,31 @@
+KOIN V42 — RED TEAM HARDENING
+
+1. Customer order authorization
+- Every new order receives a random 32-byte order token.
+- Customer mutation endpoints require X-Order-Token:
+  - cancel
+  - currency change
+  - proof upload
+  - payment reported
+- Token is returned only at order creation and stored locally in the customer's browser.
+- Public tracking never exposes the token.
+
+2. Admin order data
+- Admin order list uses a separate serializer.
+- Customer email/customer ID remain available to the authenticated admin UI.
+- proofPath and orderToken are never sent to the admin browser.
+
+3. Payment rejection
+- Added authenticated admin action: Payment not confirmed.
+- Rejected payment returns the order to PENDING_PAYMENT.
+- Payment method/reference, processing timer and previous proof are cleared.
+- Previous proof file is removed.
+- Customer receives a payment-not-confirmed email.
+
+4. Frontend
+- Checkout stores the order token returned by order creation.
+- Customer mutation requests automatically send the token.
+- Existing visual design/layout preserved.
+
+5. ABSA
+- ABSA remains suspended and was not reintroduced.
